@@ -31,8 +31,10 @@ export class EditorColaborativoComponent implements OnInit, OnDestroy, AfterView
   loading = true;
   error = '';
   showDetalle = false;
-  guardando = false;
-  tienesCambios = false;
+  // Guardado de versión
+  showGuardarDialog = false;
+  nombreVersion = '';
+  guardandoVersion = false;
   private docEditor: any = null;
   private scriptLoaded = false;
 
@@ -68,22 +70,46 @@ export class EditorColaborativoComponent implements OnInit, OnDestroy, AfterView
     this.router.navigate(['/documentos']);
   }
 
-  guardar(): void {
-    if (!this.docEditor) return;
-    this.guardando = true;
+  abrirGuardarVersion(): void {
+    // Forzar guardado en OnlyOffice antes de abrir el dialog
+    // para que S3 tenga el estado más reciente cuando el usuario confirme
     try {
-      this.docEditor.connector?.executeMethod('ForceSave');
-      this.messageService.add({
-        severity: 'info',
-        summary: 'Guardando...',
-        detail: 'Enviando cambios al servidor',
-        life: 3000,
-      });
+      this.docEditor?.connector?.executeMethod('ForceSave');
     } catch (e) {
-      console.error('ForceSave error:', e);
+      console.warn('ForceSave no disponible:', e);
     }
-    // El guardado real lo confirma onDocumentStateChange cuando data=false
-    setTimeout(() => { this.guardando = false; }, 5000);
+    this.nombreVersion = '';
+    this.showGuardarDialog = true;
+  }
+
+  confirmarGuardarVersion(): void {
+    if (!this.nombreVersion.trim()) return;
+    this.guardandoVersion = true;
+
+    this.docService.guardarVersion(this.documentoId, this.nombreVersion.trim()).subscribe({
+      next: (nuevaVersion) => {
+        this.guardandoVersion = false;
+        this.showGuardarDialog = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: `Versión ${nuevaVersion.version} guardada`,
+          detail: `"${nuevaVersion.nombre}" guardada correctamente`,
+          life: 4000,
+        });
+        // Navegar al nuevo documento (nueva versión)
+        this.documentoId = nuevaVersion.id;
+        this.nombreDoc = nuevaVersion.nombre;
+        this.router.navigate(['/documentos/editor', nuevaVersion.id], { replaceUrl: true });
+      },
+      error: () => {
+        this.guardandoVersion = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo guardar la versión',
+        });
+      },
+    });
   }
 
   private initEditor(): void {
@@ -156,22 +182,9 @@ export class EditorColaborativoComponent implements OnInit, OnDestroy, AfterView
           });
         },
         onDocumentStateChange: (event: any) => {
-          // event.data = true si hay cambios sin guardar
-          this.tienesCambios = event.data;
-          if (event.data) {
-            document.title = `● ${config.nombre} — SP1 BPM`;
-          } else {
-            this.guardando = false;
-            document.title = `${config.nombre} — SP1 BPM`;
-            if (!this.loading) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Guardado',
-                detail: 'Documento guardado en el servidor',
-                life: 2000,
-              });
-            }
-          }
+          document.title = event.data
+            ? `● ${config.nombre} — SP1 BPM`
+            : `${config.nombre} — SP1 BPM`;
         },
       },
     };

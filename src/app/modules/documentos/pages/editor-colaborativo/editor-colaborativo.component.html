@@ -13,13 +13,11 @@
       <i class="pi pi-file-edit mr-2"></i>{{ nombreDoc }}
     </span>
     <p-button
-      icon="pi pi-save"
-      label="Guardar"
+      icon="pi pi-tag"
+      label="Guardar versión"
       severity="success"
-      [loading]="guardando"
-      [disabled]="!tienesCambios"
-      (onClick)="guardar()"
-      pTooltip="Forzar guardado en el servidor (también Ctrl+S en el editor)"
+      (onClick)="abrirGuardarVersion()"
+      pTooltip="Guarda el estado actual como una nueva versión nombrada"
       *ngIf="!loading && !error"
     />
     <p-button
@@ -54,6 +52,48 @@
     [class.hidden]="loading || error"
   ></div>
 </div>
+
+<!-- Dialog: guardar versión nombrada -->
+<p-dialog
+  [(visible)]="showGuardarDialog"
+  header="Guardar nueva versión"
+  [modal]="true"
+  [style]="{ width: '26rem' }"
+  [closable]="!guardandoVersion">
+  <div class="flex flex-column gap-3 pt-2">
+    <p class="text-color-secondary m-0">
+      Asigná un nombre a esta versión para identificarla en el historial.
+    </p>
+    <div class="flex flex-column gap-1">
+      <label for="nombreVersion" class="font-semibold">Nombre de la versión</label>
+      <input
+        pInputText
+        id="nombreVersion"
+        [(ngModel)]="nombreVersion"
+        placeholder="Ej: Revisión final, Borrador v2..."
+        (keyup.enter)="confirmarGuardarVersion()"
+        autofocus
+      />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      [text]="true"
+      severity="secondary"
+      (onClick)="showGuardarDialog = false"
+      [disabled]="guardandoVersion"
+    />
+    <p-button
+      label="Guardar versión"
+      icon="pi pi-tag"
+      severity="success"
+      [loading]="guardandoVersion"
+      [disabled]="!nombreVersion.trim()"
+      (onClick)="confirmarGuardarVersion()"
+    />
+  </ng-template>
+</p-dialog>
 
 <!-- Drawer: info, historial y permisos del documento -->
 <p-drawer

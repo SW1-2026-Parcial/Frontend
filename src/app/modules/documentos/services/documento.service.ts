@@ -148,6 +148,10 @@ export class DocumentoService {
     return this.http.get<Documento[]>(`${this.BASE}/${id}/versiones`);
   }
 
+  guardarVersion(id: string, nombre: string): Observable<Documento> {
+    return this.http.post<Documento>(`${this.BASE}/${id}/guardar-version`, { nombre });
+  }
+
   // ── Eliminar ──────────────────────────────────────────────────────────────
 
   eliminar(id: string): Observable<void> {
