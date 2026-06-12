@@ -207,7 +207,7 @@ export class DocumentoDetalleComponent implements OnInit, OnChanges {
     });
   }
 
-  onTabChange(value: string): void {
+  onTabChange(value: string | number | undefined): void {
     if (value === 'versiones' && this.versiones.length === 0) {
       this.cargarVersiones();
     }
