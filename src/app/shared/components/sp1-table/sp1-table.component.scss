@@ -1,0 +1,29 @@
+@use 'abstracts' as *;
+
+// Estilos específicos de la tabla sp1 — extiende el tema PrimeNG corporativo
+
+.sp1-table {
+  width: 100%;
+
+  &__caption {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    padding: $space-2 0;
+  }
+
+  &__row {
+    cursor: pointer;
+    transition: background-color $transition-fast;
+  }
+
+  &__actions {
+    @include flex-row($space-1);
+    justify-content: flex-start;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: $space-12 $space-4 !important;
+  }
+}

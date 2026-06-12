@@ -1,0 +1,101 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-container__header">
+    <div class="historial__header-left">
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        [text]="true"
+        (click)="volver()"
+        pTooltip="Volver al monitor">
+      </button>
+      <div class="page-container__title-group">
+        <h1 class="historial__title">Historial del Trámite</h1>
+        <p class="historial__subtitle">Línea de tiempo de eventos</p>
+      </div>
+    </div>
+    <p-tag
+      *ngIf="tramite"
+      [value]="tramite.ticketNumber"
+      severity="info"
+      styleClass="historial__ticket">
+    </p-tag>
+  </div>
+
+  <!-- Loading -->
+  <div class="historial__loading" *ngIf="loading">
+    <p-progressSpinner strokeWidth="4" animationDuration="0.8s"></p-progressSpinner>
+    <span>Cargando historial...</span>
+  </div>
+
+  <!-- Error -->
+  <div class="historial__error" *ngIf="!loading && errorMsg">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ errorMsg }}</span>
+    <button pButton pRipple label="Reintentar" icon="pi pi-refresh" severity="secondary" [outlined]="true" (click)="volver()"></button>
+  </div>
+
+  <!-- Timeline -->
+  <div class="section" *ngIf="!loading && !errorMsg && eventos.length > 0">
+    <p-timeline [value]="eventos" align="left" styleClass="historial__timeline">
+      <ng-template pTemplate="marker" let-event>
+        <span class="evento-marker" [ngClass]="'evento-marker--' + event.tipo.toLowerCase()">
+          <i [class]="eventoIcon(event.tipo)"></i>
+        </span>
+      </ng-template>
+      <ng-template pTemplate="content" let-event>
+        <div class="evento-card">
+          <div class="evento-card__header">
+            <p-tag
+              [value]="eventoLabel(event.tipo)"
+              [severity]="eventoSeverity(event.tipo)">
+            </p-tag>
+            <span class="evento-card__time">{{ event.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+          </div>
+          <div *ngIf="event.comentario" class="evento-card__comentario">
+            <i class="pi pi-comment"></i>
+            {{ event.comentario }}
+          </div>
+          <div *ngIf="hasFormData(event)" class="evento-card__form">
+            <div *ngFor="let entry of formEntries(event.formData)" class="form-entry">
+              <span class="form-entry__key">{{ entry.key }}</span>
+              <span class="form-entry__sep">:</span>
+              <span class="form-entry__value">{{ entry.value }}</span>
+            </div>
+          </div>
+          <!-- Botón "Ver datos" solo para TASK_COMPLETED con taskId -->
+          <div *ngIf="event.tipo === 'TASK_COMPLETED' && event.taskId" class="mt-2">
+            <p-button
+              label="Ver datos del formulario"
+              icon="pi pi-eye"
+              severity="info"
+              size="small"
+              [text]="true"
+              (onClick)="abrirDetalleTarea(event.taskId)">
+            </p-button>
+          </div>
+        </div>
+      </ng-template>
+    </p-timeline>
+  </div>
+
+  <!-- Sin eventos -->
+  <ng-container *ngIf="!loading && !errorMsg && eventos.length === 0">
+    <app-sp1-empty-state
+      icon="pi-history"
+      title="Sin eventos registrados"
+      message="Este trámite aún no tiene eventos en su historial.">
+    </app-sp1-empty-state>
+  </ng-container>
+
+  <!-- Dialog de detalle de tarea -->
+  <app-tarea-historial-dialog
+    [(visible)]="dialogVisible"
+    [taskId]="selectedTaskId">
+  </app-tarea-historial-dialog>
+
+</div>

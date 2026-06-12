@@ -1,0 +1,140 @@
+<div class="auth-layout">
+  <div class="login-card" role="main">
+    <!-- Header de la tarjeta -->
+    <div class="login-card__header">
+      <div class="login-card__logo" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <h1 class="login-card__title">SW1 · 1P</h1>
+      <p class="login-card__subtitle">Sistema de Gestión de Workflow</p>
+      <!-- <p class="login-card__description">Sistema de</p> -->
+    </div>
+
+    <!-- Formulario -->
+    <form
+      class="login-card__form"
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      novalidate
+      aria-label="Formulario de inicio de sesión"
+    >
+      <!-- Campo Email -->
+      <div class="form-field">
+        <label for="email" class="form-field__label">
+          Correo electrónico
+          <span class="form-field__required" aria-hidden="true">*</span>
+        </label>
+        <div class="p-input-icon-left form-field__input-wrapper">
+          <i class="pi pi-envelope" aria-hidden="true"></i>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            formControlName="email"
+            placeholder="usuario@empresa.com"
+            autocomplete="email"
+            [class.ng-invalid]="emailInvalido"
+            [attr.aria-describedby]="emailInvalido ? 'email-error' : null"
+            [attr.aria-invalid]="emailInvalido"
+          />
+        </div>
+        <!-- Error inline bajo el campo — regla UX: error-placement -->
+        <small
+          *ngIf="emailInvalido"
+          id="email-error"
+          class="form-field__error"
+          role="alert"
+          aria-live="polite"
+        >
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          {{ emailError }}
+        </small>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="form-field">
+        <label for="password" class="form-field__label">
+          Contraseña
+          <span class="form-field__required" aria-hidden="true">*</span>
+        </label>
+        <div class="p-input-icon-left p-input-icon-right form-field__input-wrapper">
+          <i class="pi pi-lock" aria-hidden="true"></i>
+          <input
+            id="password"
+            [type]="mostrarPassword ? 'text' : 'password'"
+            pInputText
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            [class.ng-invalid]="passwordInvalido"
+            [attr.aria-describedby]="passwordInvalido ? 'password-error' : null"
+            [attr.aria-invalid]="passwordInvalido"
+          />
+          <i
+            class="pi"
+            [class.pi-eye]="!mostrarPassword"
+            [class.pi-eye-slash]="mostrarPassword"
+            (click)="togglePassword()"
+            style="cursor: pointer"
+            [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            role="button"
+            tabindex="0"
+            (keydown.enter)="togglePassword()"
+            aria-hidden="false"
+          ></i>
+        </div>
+        <small
+          *ngIf="passwordInvalido"
+          id="password-error"
+          class="form-field__error"
+          role="alert"
+          aria-live="polite"
+        >
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          {{ passwordError }}
+        </small>
+      </div>
+
+      <!-- Error general del servidor -->
+      <div *ngIf="errorMensaje" class="login-card__error-banner" role="alert" aria-live="assertive">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        {{ errorMensaje }}
+      </div>
+
+      <!-- Botón submit — deshabilitado durante carga (regla UX: loading-buttons) -->
+      <button
+        type="submit"
+        pButton
+        pRipple
+        class="p-button-primary login-card__submit"
+        [disabled]="loading"
+        [attr.aria-busy]="loading"
+        aria-label="Iniciar sesión"
+      >
+        <i
+          class="pi"
+          [class.pi-spin]="loading"
+          [class.pi-spinner]="loading"
+          [class.pi-sign-in]="!loading"
+          aria-hidden="true"
+        ></i>
+        {{ loading ? 'Verificando...' : 'Iniciar sesión' }}
+      </button>
+    </form>
+
+    <!-- Footer informativo -->
+    <div class="login-card__footer">
+      <p>Sistema de uso exclusivo para personal autorizado de CRE</p>
+    </div>
+  </div>
+</div>
+
+<p-toast position="top-right"></p-toast>

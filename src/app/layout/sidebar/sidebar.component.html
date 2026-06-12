@@ -1,0 +1,78 @@
+<nav
+  class="sp1-sidebar"
+  [class.collapsed]="collapsed"
+  role="navigation"
+  aria-label="Navegación principal"
+>
+  <!-- Toggle colapso -->
+  <button
+    class="sp1-sidebar__toggle"
+    (click)="toggleCollapse()"
+    [attr.aria-label]="collapsed ? 'Expandir menú' : 'Colapsar menú'"
+    [pTooltip]="collapsed ? 'Expandir' : 'Colapsar'"
+    tooltipPosition="right"
+  >
+    <i class="pi pi-chevron-left"></i>
+  </button>
+
+  <!-- Brand -->
+  <a class="sp1-sidebar__brand" routerLink="/" aria-label="Inicio sp1">
+    <div class="sp1-sidebar__brand-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      </svg>
+    </div>
+    <span class="sp1-sidebar__brand-name">sp1</span>
+  </a>
+
+  <!-- Navegación -->
+  <div class="sp1-sidebar__nav" role="list">
+    <div
+      *ngFor="let seccion of seccionesVisibles"
+      class="sp1-sidebar__section"
+      role="group"
+      [attr.aria-label]="seccion.title"
+    >
+      <span class="sp1-sidebar__section-title" aria-hidden="true">{{ seccion.title }}</span>
+
+      <a
+        *ngFor="let item of seccion.items"
+        class="sp1-sidebar__nav-item"
+        [routerLink]="item.route"
+        [class.active]="esRutaActiva(item)"
+        role="listitem"
+        [attr.aria-current]="esRutaActiva(item) ? 'page' : null"
+        [pTooltip]="collapsed ? item.label : ''"
+        tooltipPosition="right"
+      >
+        <span class="sp1-sidebar__nav-item-icon" aria-hidden="true">
+          <i [class]="item.icon"></i>
+        </span>
+        <span class="sp1-sidebar__nav-item-label">{{ item.label }}</span>
+        <span *ngIf="item.badge" class="sp1-sidebar__nav-item-badge">{{ item.badge }}</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer con usuario -->
+  <div class="sp1-sidebar__footer">
+    <div class="sp1-sidebar__user" *ngIf="usuario">
+      <div class="sp1-sidebar__user-avatar" [attr.aria-label]="usuario.nombre">
+        {{ iniciales }}
+      </div>
+      <div class="sp1-sidebar__user-info">
+        <span class="sp1-sidebar__user-name">{{ usuario.nombre }}</span>
+        <span class="sp1-sidebar__user-role">{{ rolLabel(usuario.rol) }}</span>
+      </div>
+      <button
+        class="sp1-sidebar__logout-btn"
+        (click)="logout()"
+        pTooltip="Cerrar sesión"
+        tooltipPosition="right"
+        aria-label="Cerrar sesión"
+      >
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </div>
+</nav>

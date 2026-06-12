@@ -1,0 +1,163 @@
+<div class="detalle">
+
+  <!-- Topbar -->
+  <div class="detalle__topbar">
+    <button pButton pRipple type="button"
+      icon="pi pi-arrow-left"
+      class="p-button-text p-button-secondary p-button-sm"
+      (click)="volver()"
+      pTooltip="Volver al catálogo" tooltipPosition="right"
+    ></button>
+    <div class="detalle__meta" *ngIf="politica">
+      <h2 class="detalle__nombre">{{ politica.nombre }}</h2>
+      <span class="detalle__badge"><i class="pi pi-check-circle"></i> Publicada</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="detalle__loading">
+    <p-progressSpinner [style]="{ width: '40px', height: '40px' }"></p-progressSpinner>
+    <span>Cargando proceso...</span>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!loading && politica" class="detalle__body">
+
+    <!-- Panel izquierdo: Info del proceso -->
+    <div class="detalle__flujo">
+
+      <!-- Descripcion -->
+      <div class="detalle__info-card">
+        <h3 class="detalle__section-title">
+          <i class="pi pi-info-circle"></i> Sobre este proceso
+        </h3>
+        <p class="detalle__descripcion">{{ politica.descripcion || 'Sin descripcion disponible.' }}</p>
+        <div *ngIf="totalActividades" class="detalle__stat">
+          <i class="pi pi-cog"></i>
+          <span>{{ totalActividades }} etapa{{ totalActividades > 1 ? 's' : '' }} en total</span>
+        </div>
+      </div>
+
+      <!-- Requisitos del primer paso -->
+      <div *ngIf="primerActividad" class="detalle__requisitos-card">
+        <h3 class="detalle__section-title">
+          <i class="pi pi-list"></i> Primer paso: {{ primerActividad.etiqueta }}
+        </h3>
+
+        <p *ngIf="primerActividad.instruccionAvance" class="detalle__instruccion">
+          <i class="pi pi-info-circle"></i>
+          {{ primerActividad.instruccionAvance }}
+        </p>
+
+        <!-- Documentos requeridos -->
+        <div *ngIf="camposArchivo.length" class="detalle__docs">
+          <h4 class="detalle__subsection">
+            <i class="pi pi-file"></i> Documentos a preparar
+          </h4>
+          <ul class="detalle__doc-list">
+            <li *ngFor="let campo of camposArchivo" class="detalle__doc-item">
+              <i class="pi pi-paperclip"></i>
+              <span>{{ campo.etiqueta }}</span>
+              <span *ngIf="campo.requerido" class="detalle__required-tag">Requerido</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Campos del formulario -->
+        <div *ngIf="camposPrimerPaso.length" class="detalle__campos">
+          <h4 class="detalle__subsection">
+            <i class="pi pi-pencil"></i> Campos a completar
+          </h4>
+          <div class="detalle__campo-grid">
+            <div *ngFor="let campo of camposPrimerPaso" class="detalle__campo-chip"
+                 [class.detalle__campo-chip--requerido]="campo.requerido">
+              <span class="detalle__campo-nombre">{{ campo.etiqueta }}</span>
+              <span class="detalle__campo-tipo">{{ campo.tipo }}</span>
+              <i *ngIf="campo.requerido" class="pi pi-asterisk detalle__campo-req"></i>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!camposPrimerPaso.length" class="detalle__sin-campos">
+          <i class="pi pi-check-circle"></i>
+          <span>Este paso no requiere completar campos ni documentos.</span>
+        </div>
+      </div>
+
+      <!-- Sin info del primer paso -->
+      <div *ngIf="!primerActividad && !loading" class="detalle__requisitos-card">
+        <div class="detalle__sin-campos">
+          <i class="pi pi-info-circle"></i>
+          <span>Inicia el tramite para ver las tareas asignadas en tu bandeja.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Panel derecho: Formulario para iniciar -->
+    <aside class="detalle__form-panel">
+      <div class="form-panel">
+        <h3 class="form-panel__title">
+          <i class="pi pi-play-circle"></i> Iniciar tramite
+        </h3>
+        <p class="form-panel__desc">
+          Selecciona la prioridad y haz clic en iniciar. La primera tarea aparecera en tu bandeja.
+        </p>
+
+        <form [formGroup]="formTramite" (ngSubmit)="iniciarTramite()" novalidate class="form-panel__form">
+
+          <div class="panel-field">
+            <label class="label-field">Prioridad <span class="text-danger">*</span></label>
+            <p-select
+              formControlName="prioridad"
+              [options]="prioridades"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              appendTo="body"
+            ></p-select>
+          </div>
+
+          <button
+            pButton pRipple type="submit"
+            label="Iniciar tramite" icon="pi pi-play"
+            class="p-button-primary w-full"
+            [loading]="loadingIniciar"
+          ></button>
+        </form>
+      </div>
+    </aside>
+
+  </div>
+
+</div>
+
+<!-- Dialog: ticket generado -->
+<p-dialog
+  [(visible)]="mostrarTicketDialog"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '420px' }"
+  styleClass="sp1-dialog"
+>
+  <div class="ticket-dialog">
+    <div class="ticket-dialog__icon">
+      <i class="pi pi-check-circle"></i>
+    </div>
+    <h3 class="ticket-dialog__title">Tramite iniciado</h3>
+    <p class="ticket-dialog__desc">El tramite fue registrado. El numero de ticket es:</p>
+    <div class="ticket-dialog__ticket">{{ ticketGenerado }}</div>
+    <p class="ticket-dialog__hint">
+      Comparte este numero con el cliente para seguimiento. La primera tarea ya esta disponible en tu bandeja.
+    </p>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple type="button"
+      label="Ir a mi bandeja" icon="pi pi-inbox"
+      class="p-button-primary w-full"
+      (click)="irABandeja()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>

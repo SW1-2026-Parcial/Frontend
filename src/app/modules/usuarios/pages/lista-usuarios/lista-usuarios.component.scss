@@ -1,0 +1,98 @@
+@use 'abstracts' as *;
+
+// Lista de usuarios — estilos específicos de la página
+
+.page-actions {
+  @include flex-row($space-2);
+}
+
+.tab-toolbar {
+  @include flex-row($space-3);
+  margin-bottom: $space-4;
+  padding-bottom: $space-4;
+  border-bottom: 1px solid $color-border;
+
+  input {
+    width: 280px;
+  }
+}
+
+// KPI Cards
+.kpi-card {
+  @include card-compact;
+  @include flex-row($space-4);
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $border-radius-lg;
+    @include flex-center;
+    flex-shrink: 0;
+
+    i { font-size: 20px; }
+
+    &--primary {
+      background: $color-primary-50;
+      i { color: $color-primary-500; }
+    }
+
+    &--warning {
+      background: $color-warning-light;
+      i { color: $color-warning; }
+    }
+
+    &--success {
+      background: $color-success-light;
+      i { color: $color-success; }
+    }
+  }
+
+  &__data {
+    @include flex-col($space-1);
+  }
+
+  &__value {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    line-height: 1;
+  }
+
+  &__label {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// Override del tab PrimeNG para que quede corporativo
+:host ::ng-deep {
+  .p-tabview {
+    .p-tabview-nav {
+      border-bottom: 2px solid $color-border;
+      padding: 0;
+
+      li .p-tabview-nav-link {
+        font-weight: $font-weight-medium;
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+        border: none;
+        padding: $space-3 $space-4;
+
+        &:focus { box-shadow: none; }
+      }
+
+      li.p-highlight .p-tabview-nav-link {
+        color: $color-primary-500;
+        border-bottom: 2px solid $color-primary-500;
+        font-weight: $font-weight-semibold;
+      }
+    }
+
+    .p-tabview-panels {
+      padding: $space-4 0 0;
+    }
+  }
+}

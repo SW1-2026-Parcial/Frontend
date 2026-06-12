@@ -1,0 +1,16 @@
+<p-card styleClass="doc-card">
+  <div class="doc-card-content">
+    <div class="doc-icon">
+      <i [class]="icono" [style.color]="color"></i>
+    </div>
+    <div class="doc-info">
+      <span class="doc-name">{{ documento.nombre }}</span>
+      <span class="doc-meta">{{ documento.extension.toUpperCase() }} · {{ tamano }}</span>
+    </div>
+    <div class="doc-actions">
+      <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" (onClick)="editar.emit(documento)" />
+      <p-button icon="pi pi-download" [rounded]="true" [text]="true" severity="success" (onClick)="descargar.emit(documento)" />
+      <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="eliminar.emit(documento)" />
+    </div>
+  </div>
+</p-card>

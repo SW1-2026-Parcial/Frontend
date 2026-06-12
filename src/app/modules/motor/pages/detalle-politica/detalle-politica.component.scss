@@ -1,0 +1,333 @@
+@use 'abstracts' as *;
+
+.detalle {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  &__topbar {
+    @include flex-row($space-3);
+    align-items: center;
+    padding: $space-2 $space-4;
+    background: $color-bg-card;
+    border-bottom: 1px solid $color-border;
+    flex-shrink: 0;
+  }
+
+  &__meta {
+    @include flex-row($space-2);
+    align-items: center;
+  }
+
+  &__nombre {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__badge {
+    @include flex-row($space-1);
+    align-items: center;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: #065f46;
+    background: #d1fae5;
+    padding: 2px 8px;
+    border-radius: $border-radius-full;
+    i { font-size: 10px; }
+  }
+
+  &__loading {
+    @include flex-col($space-3);
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    gap: 0;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  &__flujo {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: $space-5;
+    @include custom-scrollbar;
+  }
+
+  &__section-title {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 $space-3;
+
+    &--sm {
+      margin-top: $space-5;
+      font-size: $font-size-xs;
+    }
+  }
+
+  &__requisitos {
+    margin-top: $space-5;
+  }
+
+  &__form-panel {
+    width: 340px;
+    max-width: 340px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-left: 1px solid $color-border;
+    background: $color-bg-card;
+    padding: $space-5;
+    @include custom-scrollbar;
+  }
+}
+
+// ── Info card ─────────────────────────────────────────────────────────────────
+
+.detalle {
+  &__info-card,
+  &__requisitos-card {
+    @include card;
+    padding: $space-4;
+    margin-bottom: $space-4;
+  }
+
+  &__descripcion {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+    margin: 0 0 $space-3;
+  }
+
+  &__stat {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    i { font-size: 12px; }
+  }
+
+  &__instruccion {
+    @include flex-row($space-2);
+    align-items: flex-start;
+    font-size: $font-size-sm;
+    color: $color-primary-700;
+    background: $color-primary-50;
+    border: 1px solid $color-primary-200;
+    border-radius: $border-radius-md;
+    padding: $space-3;
+    margin-bottom: $space-3;
+    line-height: $line-height-normal;
+    i { margin-top: 2px; flex-shrink: 0; }
+  }
+
+  &__docs {
+    margin-bottom: $space-3;
+  }
+
+  &__subsection {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 $space-2;
+    i { font-size: 12px; }
+  }
+
+  &__doc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__doc-item {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    padding: $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    background: $color-bg-card;
+    margin-bottom: $space-1;
+    i { font-size: 12px; color: $color-text-muted; }
+  }
+
+  &__required-tag {
+    font-size: 10px;
+    font-weight: $font-weight-semibold;
+    color: #991b1b;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 1px 6px;
+    border-radius: $border-radius-full;
+    margin-left: auto;
+  }
+
+  &__campos {
+    margin-bottom: $space-3;
+  }
+
+  &__campo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__campo-chip {
+    @include flex-row($space-1);
+    align-items: center;
+    font-size: $font-size-xs;
+    padding: $space-1 $space-2;
+    border-radius: $border-radius-full;
+    background: $color-secondary-50;
+    border: 1px solid $color-border;
+    color: $color-text-secondary;
+
+    &--requerido {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+  }
+
+  &__campo-nombre {
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+  }
+
+  &__campo-tipo {
+    font-size: 10px;
+    color: $color-text-muted;
+    background: $color-secondary-100;
+    padding: 0 4px;
+    border-radius: $border-radius-full;
+  }
+
+  &__campo-req {
+    font-size: 8px;
+    color: $color-danger;
+  }
+
+  &__sin-campos {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    padding: $space-3;
+    i { font-size: 14px; }
+  }
+}
+
+// ── Panel del formulario ───────────────────────────────────────────────────────
+
+.form-panel {
+  @include flex-col($space-4);
+
+  &__title {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+    line-height: $line-height-normal;
+  }
+
+  &__form {
+    @include flex-col($space-3);
+  }
+}
+
+.panel-field {
+  @include flex-col($space-1);
+}
+
+.label-field {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.form-error {
+  color: $color-danger;
+  font-size: $font-size-xs;
+  min-height: 16px;
+  display: block;
+}
+
+.text-danger { color: $color-danger; }
+
+// ── Dialog ticket ──────────────────────────────────────────────────────────────
+
+.ticket-dialog {
+  @include flex-col($space-3);
+  align-items: center;
+  text-align: center;
+  padding: $space-2 0;
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    background: #d1fae5;
+    border-radius: 50%;
+    @include flex-center;
+    i { font-size: 24px; color: #059669; }
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__ticket {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-primary-600;
+    background: $color-primary-50;
+    border: 2px solid $color-primary-200;
+    border-radius: $border-radius-lg;
+    padding: $space-3 $space-6;
+    letter-spacing: 0.1em;
+  }
+
+  &__hint {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin: 0;
+    line-height: $line-height-normal;
+  }
+}

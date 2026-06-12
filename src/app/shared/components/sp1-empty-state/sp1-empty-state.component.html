@@ -1,0 +1,17 @@
+<div class="empty-state">
+  <div class="empty-state__icon">
+    <i [class]="icon"></i>
+  </div>
+  <h4 class="empty-state__title">{{ title }}</h4>
+  <p class="empty-state__message" *ngIf="message">{{ message }}</p>
+  <button
+    *ngIf="actionLabel"
+    pButton
+    pRipple
+    type="button"
+    [label]="actionLabel"
+    [icon]="actionIcon"
+    class="p-button-outlined p-button-sm"
+    (click)="actionClick.emit()"
+  ></button>
+</div>

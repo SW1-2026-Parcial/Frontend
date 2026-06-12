@@ -1,0 +1,232 @@
+// _sidebar.scss — Sidebar de navegacion con colapso
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.sp1-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: $sidebar-width;
+  background-color: $color-bg-sidebar;
+  display: flex;
+  flex-direction: column;
+  transition: width $transition-base;
+  z-index: $z-overlay;
+  @include custom-scrollbar;
+
+  &.collapsed {
+    width: $sidebar-collapsed;
+
+    .sp1-sidebar__brand-name,
+    .sp1-sidebar__nav-item-label,
+    .sp1-sidebar__section-title,
+    .sp1-sidebar__user-info {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      overflow: hidden;
+    }
+
+    .sp1-sidebar__brand {
+      justify-content: center;
+      padding: $space-5 0;
+      gap: 0;
+    }
+
+    .sp1-sidebar__section-title {
+      padding: 0;
+    }
+
+    .sp1-sidebar__nav-item {
+      justify-content: center;
+      padding: $space-3 0;
+      gap: 0;
+    }
+
+    .sp1-sidebar__user {
+      justify-content: center;
+      gap: 0;
+    }
+  }
+
+  &__brand {
+    @include flex-row($space-3);
+    padding: $space-5 $space-4;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    min-height: $header-height;
+    flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
+
+    &-icon {
+      width: 36px;
+      height: 36px;
+      background: $color-primary-500;
+      border-radius: $border-radius-md;
+      @include flex-center;
+      flex-shrink: 0;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: #fff;
+      }
+    }
+
+    &-name {
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      color: $color-text-inverse;
+      @include truncate;
+      transition: opacity $transition-base, width $transition-base;
+    }
+  }
+
+  &__nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: $space-4 0;
+    @include custom-scrollbar;
+  }
+
+  &__section {
+    &-title {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: $color-secondary-500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: $space-4 $space-4 $space-2;
+      transition: opacity $transition-base;
+    }
+  }
+
+  &__nav-item {
+    @include flex-row($space-3);
+    padding: $space-3 $space-4;
+    color: $color-secondary-400;
+    cursor: pointer;
+    margin: 0 $space-2;
+    border-radius: $border-radius-md;
+    transition: background-color $transition-fast, color $transition-fast;
+    text-decoration: none;
+    position: relative;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      color: $color-text-inverse;
+    }
+
+    &.active {
+      background-color: $color-primary-500;
+      color: $color-text-inverse;
+
+      .sp1-sidebar__nav-item-icon {
+        color: $color-text-inverse;
+      }
+    }
+
+    &-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: inherit;
+
+      i {
+        font-size: 18px;
+      }
+    }
+
+    &-label {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      @include truncate;
+      transition: opacity $transition-base;
+    }
+
+    &-badge {
+      margin-left: auto;
+      background: $color-danger;
+      color: #fff;
+      font-size: 10px;
+      font-weight: $font-weight-bold;
+      padding: 1px 6px;
+      border-radius: $border-radius-full;
+      min-width: 18px;
+      text-align: center;
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: $space-4;
+    flex-shrink: 0;
+  }
+
+  &__user {
+    @include flex-row($space-3);
+
+    &-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: $border-radius-full;
+      background: $color-primary-700;
+      @include flex-center;
+      flex-shrink: 0;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-text-inverse;
+    }
+
+    &-info {
+      flex: 1;
+      overflow: hidden;
+      transition: opacity $transition-base;
+    }
+
+    &-name {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-text-inverse;
+      @include truncate;
+    }
+
+    &-role {
+      font-size: $font-size-xs;
+      color: $color-secondary-400;
+      @include truncate;
+    }
+  }
+
+  &__toggle {
+    position: absolute;
+    top: $space-5;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    background: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-full;
+    @include flex-center;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+    color: $color-text-secondary;
+    transition: transform $transition-base;
+    z-index: $z-raised;
+
+    &:hover {
+      background: $color-secondary-50;
+      color: $color-primary-500;
+    }
+
+    i {
+      font-size: 12px;
+      transition: transform $transition-base;
+    }
+
+    .collapsed & i {
+      transform: rotate(180deg);
+    }
+  }
+}

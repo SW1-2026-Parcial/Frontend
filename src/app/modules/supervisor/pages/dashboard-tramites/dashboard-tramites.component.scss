@@ -1,0 +1,155 @@
+@use 'abstracts' as *;
+
+.dashboard {
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin: 0 0 $space-1;
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__filtros {
+    @include flex-row($space-3);
+    margin-bottom: $space-6;
+    flex-wrap: wrap;
+  }
+
+  &__select {
+    min-width: 180px;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+  }
+
+  &__search-input {
+    width: 200px;
+    font-size: $font-size-sm;
+  }
+}
+
+// ── Section overrides ─────────────────────────────────────────────────────────
+
+.section {
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__count {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+}
+
+// ── Lista ─────────────────────────────────────────────────────────────────────
+
+.tramites-list {
+  @include flex-col($space-3);
+}
+
+.tramite-skeleton {
+  border-radius: $border-radius-lg;
+}
+
+// ── Card de trámite ───────────────────────────────────────────────────────────
+
+.tramite-card {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-4;
+  border-radius: $border-radius-lg;
+  border: 1px solid $color-border;
+  background: $color-bg-card;
+  border-left-width: 4px;
+  border-left-color: $color-border;
+  transition: box-shadow $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  &--active {
+    border-left-color: $color-warning;
+    background: $color-warning-light;
+  }
+
+  &--completed {
+    border-left-color: $color-success;
+    background: $color-success-light;
+  }
+
+  &--rejected {
+    border-left-color: $color-danger;
+    background: $color-danger-light;
+  }
+
+  &--paused {
+    border-left-color: $color-text-muted;
+    background: $color-neutral-light;
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    @include flex-col($space-2);
+  }
+
+  &__proceso {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    @include truncate;
+  }
+
+  &__ticket {
+    font-family: ui-monospace, monospace;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-primary-600;
+  }
+
+  &__meta {
+    @include flex-row($space-4);
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__nodos {
+    @include flex-row($space-1);
+  }
+
+  &__nodo-icon {
+    font-size: 8px;
+    color: $color-warning;
+  }
+
+  &__fecha {
+    @include flex-row($space-1);
+  }
+
+  &__badges {
+    @include flex-row($space-2);
+    flex-wrap: wrap;
+  }
+
+  &__side {
+    @include flex-col($space-2);
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+}

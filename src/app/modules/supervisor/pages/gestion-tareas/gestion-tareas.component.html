@@ -1,0 +1,218 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-container__header">
+    <div class="page-container__title-group">
+      <h1 class="gt__title">Gestión de Tareas</h1>
+      <p class="gt__subtitle">Tareas pendientes sin asignar — delegación, rechazo y completado</p>
+    </div>
+    <button pButton pRipple type="button"
+      label="Actualizar" icon="pi pi-refresh"
+      severity="secondary" [outlined]="true" size="small"
+      [loading]="loading"
+      (click)="cargar()">
+    </button>
+  </div>
+
+  <!-- Búsqueda -->
+  <div class="gt__filtros">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input pInputText type="text"
+        [(ngModel)]="textoBusqueda"
+        placeholder="Buscar por ticket, proceso, actividad o departamento…"
+        class="gt__search"/>
+    </span>
+    <span class="gt__count">{{ tareasFiltradas.length }} tarea(s)</span>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="gt__loading">
+    <p-progressSpinner [style]="{ width: '36px', height: '36px' }"></p-progressSpinner>
+    <span>Cargando tareas…</span>
+  </div>
+
+  <!-- Vacío -->
+  <app-sp1-empty-state
+    *ngIf="!loading && tareasFiltradas.length === 0"
+    icon="pi-check-circle"
+    title="Sin tareas pendientes"
+    message="No hay tareas disponibles en este momento.">
+  </app-sp1-empty-state>
+
+  <!-- Lista -->
+  <div *ngIf="!loading && tareasFiltradas.length > 0" class="gt__list">
+    <div *ngFor="let t of tareasFiltradas" class="gt-card">
+
+      <div class="gt-card__main">
+        <div class="gt-card__top">
+          <span class="gt-card__ticket">{{ t.tramiteTicket ?? t.tramiteId | slice:0:8 }}</span>
+          <span class="gt-card__proceso">{{ t.politicaNombre ?? 'Proceso' }}</span>
+          <app-sp1-badge [estado]="t.prioridad ?? 'MEDIUM'"></app-sp1-badge>
+        </div>
+        <h3 class="gt-card__nombre">{{ t.nodoNombre ?? 'Actividad' }}</h3>
+        <div class="gt-card__meta">
+          <span><i class="pi pi-building"></i> {{ t.departamentoNombre ?? '—' }}</span>
+          <span><i class="pi pi-clock"></i> {{ t.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+
+      <div class="gt-card__actions">
+        <button pButton pRipple type="button"
+          label="Delegar" icon="pi pi-user-plus"
+          class="p-button-outlined p-button-sm p-button-primary"
+          pTooltip="Asignar a un funcionario"
+          (click)="abrirDelegar(t)">
+        </button>
+        <button pButton pRipple type="button"
+          label="Completar" icon="pi pi-check"
+          class="p-button-outlined p-button-sm p-button-success"
+          pTooltip="Ir al formulario de la tarea"
+          (click)="abrirCompletar(t)">
+        </button>
+        <button pButton pRipple type="button"
+          label="Rechazar" icon="pi pi-times"
+          class="p-button-outlined p-button-sm p-button-danger"
+          pTooltip="Rechazar esta tarea"
+          (click)="abrirRechazar(t)">
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Dialog: Delegar ── -->
+<p-dialog
+  [(visible)]="mostrarDlgDelegar"
+  [modal]="true"
+  header="Delegar tarea"
+  [style]="{ width: '460px' }"
+  styleClass="sp1-dialog">
+
+  <div *ngIf="tareaDelegar" class="dlg-body">
+    <div class="dlg-info">
+      <span class="dlg-info__ticket">{{ tareaDelegar.tramiteTicket }}</span>
+      <span class="dlg-info__sep">·</span>
+      <span class="dlg-info__nodo">{{ tareaDelegar.nodoNombre }}</span>
+    </div>
+
+    <div *ngIf="cargandoFuncionarios" class="dlg-loading">
+      <p-progressSpinner [style]="{ width: '28px', height: '28px' }"></p-progressSpinner>
+      <span>Cargando funcionarios…</span>
+    </div>
+
+    <div *ngIf="!cargandoFuncionarios" class="panel-field">
+      <label class="label-field">Asignar a</label>
+      <p-select
+        [options]="funcionarios"
+        [(ngModel)]="funcionarioElegido"
+        optionLabel="nombre"
+        placeholder="Selecciona un funcionario"
+        styleClass="w-full"
+        appendTo="body"
+        [showClear]="true">
+        <ng-template pTemplate="item" let-u>
+          <div class="dlg-user-opt">
+            <span class="dlg-user-opt__nombre">{{ u.nombre }}</span>
+            <span class="dlg-user-opt__depto">{{ u.departamentoNombre ?? u.departamentoId }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+      <small *ngIf="funcionarios.length === 0" class="form-hint">
+        No hay funcionarios activos disponibles.
+      </small>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple type="button"
+      label="Cancelar" severity="secondary" [text]="true"
+      (click)="mostrarDlgDelegar = false">
+    </button>
+    <button pButton pRipple type="button"
+      label="Delegar" icon="pi pi-user-plus"
+      [loading]="delegando"
+      [disabled]="!funcionarioElegido || cargandoFuncionarios"
+      (click)="confirmarDelegar()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Dialog: Rechazar ── -->
+<p-dialog
+  [(visible)]="mostrarDlgRechazar"
+  [modal]="true"
+  header="Rechazar tarea"
+  [style]="{ width: '440px' }"
+  styleClass="sp1-dialog">
+
+  <div *ngIf="tareaRechazar" class="dlg-body">
+    <div class="dlg-info">
+      <span class="dlg-info__ticket">{{ tareaRechazar.tramiteTicket }}</span>
+      <span class="dlg-info__sep">·</span>
+      <span class="dlg-info__nodo">{{ tareaRechazar.nodoNombre }}</span>
+    </div>
+    <p class="dlg-warn">
+      <i class="pi pi-exclamation-triangle" style="color: var(--p-red-500); flex-shrink: 0"></i>
+      <span><strong>Esta acción cancela el trámite completo.</strong> Todas las tareas activas se cerrarán y el proceso quedará en estado RECHAZADO. Esta operación no se puede deshacer.</span>
+    </p>
+    <div class="panel-field">
+      <label class="label-field">Motivo de rechazo <span class="text-danger">*</span></label>
+      <textarea pInputTextarea [(ngModel)]="motivoRechazo"
+        rows="3" style="width:100%; resize:vertical"
+        placeholder="Describe el motivo…"></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple type="button"
+      label="Cancelar" severity="secondary" [text]="true"
+      (click)="mostrarDlgRechazar = false">
+    </button>
+    <button pButton pRipple type="button"
+      label="Rechazar" icon="pi pi-times"
+      severity="danger"
+      [loading]="rechazando"
+      [disabled]="!motivoRechazo.trim()"
+      (click)="confirmarRechazar()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Dialog: Completar ── -->
+<p-dialog
+  [(visible)]="mostrarDlgCompletar"
+  [modal]="true"
+  header="Completar tarea"
+  [style]="{ width: '400px' }"
+  styleClass="sp1-dialog">
+
+  <div *ngIf="tareaCompletar" class="dlg-body">
+    <div class="dlg-info">
+      <span class="dlg-info__ticket">{{ tareaCompletar.tramiteTicket }}</span>
+      <span class="dlg-info__sep">·</span>
+      <span class="dlg-info__nodo">{{ tareaCompletar.nodoNombre }}</span>
+    </div>
+    <p class="dlg-warn">
+      <i class="pi pi-exclamation-triangle" style="color: var(--p-orange-500)"></i>
+      El trámite avanzará al siguiente nodo sin completar el formulario de la actividad.
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple type="button"
+      label="Cancelar" severity="secondary" [text]="true"
+      (click)="mostrarDlgCompletar = false">
+    </button>
+    <button pButton pRipple type="button"
+      label="Confirmar" icon="pi pi-check"
+      severity="success"
+      [loading]="completando"
+      (click)="confirmarCompletar()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>

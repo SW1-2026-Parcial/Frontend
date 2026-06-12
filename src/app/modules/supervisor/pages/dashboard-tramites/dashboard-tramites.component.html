@@ -1,0 +1,165 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-container__header">
+    <div class="page-container__title-group">
+      <h1 class="dashboard__title">Monitor de Trámites</h1>
+      <p class="dashboard__subtitle">Seguimiento en tiempo real de todos los procesos</p>
+    </div>
+    <button
+      pButton
+      pRipple
+      type="button"
+      label="Actualizar"
+      icon="pi pi-refresh"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [loading]="loading"
+      (click)="actualizar()">
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="dashboard__filtros">
+    <!-- Búsqueda por ticket -->
+    <span class="p-input-icon-left dashboard__search">
+      <i class="pi pi-search"></i>
+      <input pInputText type="text"
+        [(ngModel)]="textoBusqueda"
+        placeholder="Buscar por ticket…"
+        class="dashboard__search-input"/>
+    </span>
+
+    <!-- Filtro por estado -->
+    <p-select
+      [options]="statusOpciones"
+      [(ngModel)]="statusSeleccionado"
+      optionLabel="label"
+      placeholder="Estado"
+      (onChange)="aplicarFiltroStatus()"
+      appendTo="body"
+      styleClass="dashboard__select">
+    </p-select>
+
+    <!-- Filtro por proceso -->
+    <p-select
+      [options]="politicaOpciones"
+      [(ngModel)]="politicaSeleccionada"
+      optionLabel="label"
+      placeholder="Proceso"
+      (onChange)="aplicarFiltroPolitica()"
+      appendTo="body"
+      styleClass="dashboard__select">
+    </p-select>
+
+    <button
+      *ngIf="tieneFiltros"
+      pButton
+      pRipple
+      type="button"
+      label="Limpiar"
+      icon="pi pi-filter-slash"
+      severity="secondary"
+      [text]="true"
+      size="small"
+      (click)="limpiarFiltros()">
+    </button>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-card__value">{{ totalTramites }}</span>
+      <span class="kpi-card__label">Total</span>
+    </div>
+    <div class="kpi-card kpi-card--active">
+      <span class="kpi-card__value">{{ tramitesActivos }}</span>
+      <span class="kpi-card__label">Activos</span>
+    </div>
+    <div class="kpi-card kpi-card--completed">
+      <span class="kpi-card__value">{{ tramitesCompletados }}</span>
+      <span class="kpi-card__label">Completados</span>
+    </div>
+    <div class="kpi-card kpi-card--rejected">
+      <span class="kpi-card__value">{{ tramitesRechazados }}</span>
+      <span class="kpi-card__label">Rechazados</span>
+    </div>
+  </div>
+
+  <!-- Lista de trámites -->
+  <div class="section">
+    <div class="section__header">
+      <h2 class="section__title">Trámites</h2>
+      <span class="section__count">{{ tramitesFiltrados.length }} resultado(s)</span>
+    </div>
+
+    <!-- Loading -->
+    <ng-container *ngIf="loading && tramites.length === 0">
+      <div class="tramites-list">
+        <p-skeleton *ngFor="let i of [1,2,3,4]" height="80px" styleClass="tramite-skeleton"></p-skeleton>
+      </div>
+    </ng-container>
+
+    <!-- Vacío -->
+    <ng-container *ngIf="!loading && tramitesFiltrados.length === 0">
+      <app-sp1-empty-state
+        icon="pi-desktop"
+        title="Sin trámites"
+        message="No hay trámites que coincidan con los filtros seleccionados.">
+      </app-sp1-empty-state>
+    </ng-container>
+
+    <!-- Cards -->
+    <div class="tramites-list" *ngIf="tramitesFiltrados.length > 0">
+      <div
+        *ngFor="let t of tramitesFiltrados"
+        class="tramite-card"
+        [class.tramite-card--active]="t.status === 'ACTIVE'"
+        [class.tramite-card--completed]="t.status === 'COMPLETED'"
+        [class.tramite-card--rejected]="t.status === 'REJECTED'"
+        [class.tramite-card--paused]="t.status === 'CANCELLED'">
+
+        <div class="tramite-card__main">
+          <!-- Proceso + Ticket -->
+          <div class="tramite-card__proceso">{{ nombrePolitica(t) }}</div>
+          <div class="tramite-card__ticket">{{ t.ticketNumber }}</div>
+
+          <!-- Nodos activos -->
+          <div class="tramite-card__meta">
+            <span class="tramite-card__nodos">
+              <i class="pi pi-circle-fill tramite-card__nodo-icon"></i>
+              {{ t.currentNodeIds.length }} nodo(s) activo(s)
+            </span>
+            <span class="tramite-card__fecha">
+              <i class="pi pi-calendar"></i>
+              {{ t.startedAt | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+
+          <!-- Badges -->
+          <div class="tramite-card__badges">
+            <app-sp1-badge [estado]="t.prioridad"></app-sp1-badge>
+            <app-sp1-badge [estado]="t.status"></app-sp1-badge>
+          </div>
+        </div>
+
+        <div class="tramite-card__side">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Ver historial"
+            icon="pi pi-history"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            (click)="verHistorial(t)">
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

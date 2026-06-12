@@ -1,0 +1,84 @@
+@use 'abstracts' as *;
+
+// Estilos del dialog estándar sp1
+
+:host ::ng-deep {
+  .sp1-dialog {
+    .p-dialog-header {
+      padding: $space-5 $space-6;
+      background: $color-bg-card;
+      color: $color-text-primary;
+      border-bottom: 1px solid $color-border;
+    }
+
+    .p-dialog-content {
+      background: $color-bg-card;
+      color: $color-text-primary;
+    }
+
+    .p-dialog-footer {
+      padding: $space-4 $space-6;
+      background: $color-secondary-50;
+      color: $color-text-primary;
+      border-top: 1px solid $color-border;
+    }
+
+    // Tipo danger — header con tono de advertencia
+    &.sp1-dialog--danger {
+      .p-dialog-header {
+        background: #fff5f5;
+        border-bottom-color: #fecdd3;
+      }
+    }
+  }
+}
+
+.sp1-dialog {
+  &__header {
+    @include flex-row($space-3);
+    flex: 1;
+
+    &-icon {
+      width: 40px;
+      height: 40px;
+      background: $color-danger-light;
+      border-radius: $border-radius-md;
+      @include flex-center;
+      flex-shrink: 0;
+
+      i {
+        color: $color-danger;
+        font-size: 18px;
+      }
+    }
+
+    &-text {
+      @include flex-col($space-1);
+    }
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__body {
+    padding: $space-6;
+    max-height: 70vh;
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  &__footer {
+    @include flex-row($space-3);
+    justify-content: flex-end;
+  }
+}

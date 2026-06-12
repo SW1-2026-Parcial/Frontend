@@ -1,0 +1,61 @@
+@use 'abstracts' as *;
+
+.fd-field {
+  @include flex-col($space-1);
+  margin-bottom: $space-3;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.fd-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.fd-required {
+  color: $color-danger;
+  margin-left: 2px;
+}
+
+.fd-error {
+  color: $color-danger;
+  font-size: $font-size-xs;
+}
+
+// ── File input ────────────────────────────────────────────────────────────────
+
+.fd-file-wrap {
+  position: relative;
+}
+
+.fd-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.fd-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  border: 1px dashed $color-border-strong;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: border-color $transition-fast, color $transition-fast;
+  width: 100%;
+  justify-content: center;
+
+  &:hover {
+    border-color: $color-primary-500;
+    color: $color-primary-600;
+  }
+
+  i { font-size: 14px; }
+}

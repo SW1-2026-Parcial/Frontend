@@ -1,0 +1,92 @@
+<div class="reporte-container">
+  <p-toast />
+
+  <!-- Header -->
+  <div class="reporte-header">
+    <div>
+      <h2><i class="pi pi-file-export mr-2"></i>Generador de Reportes</h2>
+      <p>Describí en lenguaje natural qué datos necesitás. La IA te guiará si falta información.</p>
+    </div>
+    <p-button
+      icon="pi pi-refresh"
+      label="Nueva consulta"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="nueva()"
+    />
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-area">
+    <div
+      *ngFor="let msg of mensajes"
+      class="chat-mensaje"
+      [ngClass]="msg.rol"
+    >
+      <!-- Burbuja de texto -->
+      <div class="burbuja">
+        <div class="texto" [innerHTML]="msg.texto | reporteMarkdown"></div>
+
+        <!-- Preview de criterios (cuando la IA parsea algo) -->
+        <div class="criterios-mini" *ngIf="msg.criterios && !msg.listo">
+          <div class="criterio-row" *ngIf="msg.criterios.formato">
+            <i class="pi pi-file"></i>
+            <span>{{ msg.criterios.formato }}</span>
+          </div>
+          <div class="criterio-row" *ngIf="msg.criterios.estado">
+            <i class="pi pi-filter"></i>
+            <span>Estado: {{ msg.criterios.estado }}</span>
+          </div>
+          <div class="criterio-row" *ngIf="msg.criterios.fechaDesde || msg.criterios.fechaHasta">
+            <i class="pi pi-calendar"></i>
+            <span>{{ msg.criterios.fechaDesde || '...' }} → {{ msg.criterios.fechaHasta || '...' }}</span>
+          </div>
+        </div>
+
+        <!-- Botón generar (cuando ya está listo) -->
+        <div class="generar-area" *ngIf="msg.listo && msg.criterios">
+          <p-button
+            icon="pi pi-download"
+            label="Generar y Descargar"
+            (onClick)="generarReporte(msg.criterios!)"
+            [loading]="generando"
+            size="small"
+          />
+        </div>
+
+        <div class="msg-time">{{ msg.timestamp | date:'HH:mm' }}</div>
+      </div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="chat-mensaje assistant" *ngIf="loading">
+      <div class="burbuja typing">
+        <div class="dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <div #chatEnd></div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <input
+      type="text"
+      pInputText
+      [(ngModel)]="inputText"
+      placeholder="Ej: dame los trámites completados del mes pasado en Excel..."
+      (keydown.enter)="enviar()"
+      [disabled]="loading || generando"
+      class="w-full"
+    />
+    <p-button
+      icon="pi pi-send"
+      [rounded]="true"
+      (onClick)="enviar()"
+      [disabled]="!inputText.trim() || loading || generando"
+    />
+  </div>
+</div>

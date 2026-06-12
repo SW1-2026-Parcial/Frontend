@@ -1,0 +1,230 @@
+<div class="ejecutar" *ngIf="!loading && tarea; else loadingTpl">
+
+  <!-- Topbar / breadcrumb -->
+  <div class="ejecutar__topbar">
+    <button pButton pRipple type="button"
+      icon="pi pi-arrow-left"
+      class="p-button-text p-button-secondary p-button-sm"
+      (click)="volver()"
+      pTooltip="Volver a la bandeja" tooltipPosition="right"
+    ></button>
+    <div class="ejecutar__breadcrumb">
+      <span class="ejecutar__breadcrumb-item ejecutar__breadcrumb-item--link" (click)="volver()">Bandeja</span>
+      <span class="ejecutar__breadcrumb-sep">›</span>
+      <span class="ejecutar__breadcrumb-item">
+        <span class="ejecutar__ticket">{{ tarea.tramiteTicket ?? tarea.tramiteId | slice:0:8 }}</span>
+      </span>
+      <span class="ejecutar__breadcrumb-sep">›</span>
+      <span class="ejecutar__breadcrumb-item ejecutar__breadcrumb-current">{{ tarea.nodoNombre ?? 'Actividad' }}</span>
+    </div>
+    <div class="ejecutar__badges">
+      <app-sp1-badge [estado]="tarea.prioridad ?? 'MEDIUM'"></app-sp1-badge>
+      <app-sp1-badge [estado]="tarea.status"></app-sp1-badge>
+    </div>
+  </div>
+
+  <!-- Cuerpo -->
+  <div class="ejecutar__body">
+
+    <!-- Panel principal -->
+    <div class="ejecutar__main">
+
+      <!-- Info contextual -->
+      <div class="ejecutar__context">
+        <div class="ejecutar__context-row">
+          <i class="pi pi-sitemap"></i>
+          <span>{{ tarea.politicaNombre ?? 'Política' }}</span>
+        </div>
+        <div class="ejecutar__context-row">
+          <i class="pi pi-building"></i>
+          <span>{{ tarea.departamentoNombre ?? 'Departamento' }}</span>
+        </div>
+      </div>
+
+      <!-- Instrucción de avance -->
+      <div *ngIf="tarea.instruccionAvance" class="ejecutar__instruccion ejecutar__instruccion--avance">
+        <i class="pi pi-info-circle ejecutar__instruccion-icon"></i>
+        <div>
+          <strong>Guía para completar:</strong>
+          <p>{{ tarea.instruccionAvance }}</p>
+        </div>
+      </div>
+
+      <!-- Formulario dinámico -->
+      <div class="ejecutar__form-block">
+        <h3 class="ejecutar__section-title">
+          <i class="pi pi-list"></i> Formulario de la tarea
+        </h3>
+
+        <ng-container *ngIf="tarea.nodoFormulario.length; else sinFormulario">
+          <app-formulario-dinamico
+            [campos]="tarea.nodoFormulario"
+            [form]="formCampos"
+          ></app-formulario-dinamico>
+        </ng-container>
+
+        <ng-template #sinFormulario>
+          <p class="ejecutar__sin-formulario">Esta tarea no requiere completar campos.</p>
+        </ng-template>
+      </div>
+
+      <!-- Selector de rama (solo si hay DECISION) -->
+      <div *ngIf="tarea.nodoTieneDecision" class="ejecutar__rama-block">
+        <h3 class="ejecutar__section-title">
+          <i class="pi pi-directions"></i> Dirección del flujo
+        </h3>
+        <p class="ejecutar__rama-desc">
+          El siguiente paso es una decisión. Elige qué camino tomará el trámite.
+        </p>
+        <p-select
+          [formControl]="$any(formCampos.get('_rama'))"
+          [options]="ramasDecision"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Selecciona una opción"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-select>
+        <small
+          *ngIf="formCampos.get('_rama')?.touched && formCampos.get('_rama')?.invalid"
+          class="ejecutar__error"
+        >Debes elegir una dirección</small>
+      </div>
+
+    </div>
+
+    <!-- Panel lateral (instrucción rechazo + acciones) -->
+    <aside class="ejecutar__aside">
+
+      <div *ngIf="tarea.instruccionRechazo" class="ejecutar__instruccion ejecutar__instruccion--rechazo">
+        <i class="pi pi-exclamation-triangle ejecutar__instruccion-icon"></i>
+        <div>
+          <strong>¿Cuándo rechazar?</strong>
+          <p>{{ tarea.instruccionRechazo }}</p>
+        </div>
+      </div>
+
+      <!-- Indicador subida de archivos -->
+      <div *ngIf="subiendoArchivos" class="ejecutar__upload-progress">
+        <p-progressBar mode="indeterminate" [style]="{'height': '4px'}"></p-progressBar>
+        <small><i class="pi pi-cloud-upload"></i> Subiendo archivos a Azure…</small>
+      </div>
+
+      <div class="ejecutar__actions">
+        <button pButton pRipple type="button"
+          label="Rechazar tarea" icon="pi pi-times"
+          class="p-button-outlined p-button-danger w-full"
+          [disabled]="loadingAccion"
+          (click)="abrirDialogRechazo()"
+        ></button>
+        <button pButton pRipple type="button"
+          [label]="subiendoArchivos ? 'Subiendo archivos…' : 'Completar tarea'"
+          icon="pi pi-check"
+          class="p-button-primary w-full"
+          [loading]="loadingAccion"
+          (click)="completar()"
+        ></button>
+      </div>
+
+    </aside>
+
+  </div>
+
+</div>
+
+<!-- Loading state -->
+<ng-template #loadingTpl>
+  <div class="ejecutar__loading">
+    <p-progressSpinner [style]="{ width: '40px', height: '40px' }"></p-progressSpinner>
+    <span>Cargando tarea…</span>
+  </div>
+</ng-template>
+
+
+<!-- ── Dialog CU-07: Rechazo ── -->
+<p-dialog
+  [(visible)]="mostrarDialogRechazo"
+  [modal]="true"
+  [closable]="!loadingAccion"
+  header="Motivo de rechazo"
+  [style]="{ width: '440px' }"
+  styleClass="sp1-dialog"
+>
+  <div class="rechazo-dialog">
+    <p class="rechazo-dialog__desc">
+      Indica el motivo por el cual rechazas esta tarea.
+    </p>
+    <p class="rechazo-dialog__warn">
+      <i class="pi pi-exclamation-triangle" style="color: var(--p-red-500); flex-shrink: 0"></i>
+      <strong>Esta acción cancela el trámite completo.</strong> Todas las tareas activas se cerrarán y el proceso quedará en estado RECHAZADO. Esta operación no se puede deshacer.
+    </p>
+
+    <div *ngIf="tarea?.instruccionRechazo" class="rechazo-dialog__guia">
+      <i class="pi pi-info-circle"></i>
+      <span>{{ tarea?.instruccionRechazo }}</span>
+    </div>
+
+    <div class="panel-field">
+      <label class="label-field">Motivo <span class="text-danger">*</span></label>
+      <textarea
+        pInputTextarea
+        [formControl]="$any(formRechazo.get('motivo'))"
+        rows="4"
+        placeholder="Describe brevemente el motivo del rechazo (mínimo 10 caracteres)"
+        class="w-full"
+      ></textarea>
+      <small class="form-error">{{ errorMotivo() }}</small>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="rechazo-dialog__footer">
+      <button pButton pRipple type="button"
+        label="Cancelar"
+        class="p-button-outlined p-button-secondary"
+        [disabled]="loadingAccion"
+        (click)="mostrarDialogRechazo = false"
+      ></button>
+      <button pButton pRipple type="button"
+        label="Confirmar rechazo" icon="pi pi-times"
+        class="p-button-danger"
+        [loading]="loadingAccion"
+        (click)="confirmarRechazo()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>
+
+<!-- ── Sidebar del mini-diagrama ── -->
+<div class="diagrama-sidebar"
+     [class.diagrama-sidebar--collapsed]="diagramaColapsado">
+
+  <button class="sidebar-toggle"
+          (click)="diagramaColapsado = !diagramaColapsado"
+          [title]="diagramaColapsado ? 'Ver proceso' : 'Ocultar proceso'">
+    <i [class]="diagramaColapsado ? 'pi pi-angle-left' : 'pi pi-angle-right'"></i>
+    <span *ngIf="!diagramaColapsado" class="ml-1 text-xs">Proceso</span>
+  </button>
+
+  <ng-container *ngIf="!diagramaColapsado">
+    <p class="text-xs mb-2 font-semibold" style="color:#6b7280">Posición en el proceso</p>
+    <app-mini-diagrama
+      [nodos]="nodosDiagrama"
+      [calles]="callesDiagrama"
+      [nodoActualId]="tarea?.nodeId ?? null"
+      [nodosCompletados]="nodosCompletados"
+      (nodoClick)="abrirHistorialNodo($event)">
+    </app-mini-diagrama>
+    <p class="text-xs mt-2" style="color:#9ca3af">
+      Haz clic en un nodo verde para ver sus datos
+    </p>
+  </ng-container>
+</div>
+
+<!-- ── Dialog historial de nodo ── -->
+<app-tarea-historial-dialog
+  [(visible)]="dialogHistorialVisible"
+  [taskId]="selectedTaskId">
+</app-tarea-historial-dialog>

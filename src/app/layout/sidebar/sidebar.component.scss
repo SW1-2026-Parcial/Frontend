@@ -1,0 +1,35 @@
+@use 'abstracts' as *;
+
+:host {
+  display: block;
+  width: 0;
+  height: 0;
+  overflow: visible;
+}
+
+.sp1-sidebar {
+  &__logout-btn {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    border-radius: $border-radius-md;
+    @include flex-center;
+    color: $color-secondary-500;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color $transition-fast, color $transition-fast;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: $color-text-inverse;
+    }
+
+    i { font-size: 14px; }
+  }
+
+  &__user {
+    @include flex-row($space-2);
+    align-items: center;
+  }
+}

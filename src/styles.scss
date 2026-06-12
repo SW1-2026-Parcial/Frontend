@@ -1,0 +1,103 @@
+// =============================================================================
+// styles.scss — Raíz de estilos globales sp1
+// Importa arquitectura 7-1 + tema PrimeNG corporativo
+// =============================================================================
+
+// 1. Abstracts (variables, mixins, functions deben ir primero)
+@use 'abstracts/variables' as *;
+@use 'abstracts/functions' as *;
+@use 'abstracts/mixins' as *;
+
+// 2. Base (reset y tipografía usan las variables)
+@use 'base/reset';
+@use 'base/typography';
+
+// 3. Layout (sidebar y header)
+@use 'layout/sidebar';
+@use 'layout/header';
+
+// 4. Tema corporativo (overrides PrimeNG)
+@use 'themes/light';
+
+// PrimeNG v21 — tema configurado vía providePrimeNG() en app-module.ts
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+// ----------------------------------------------------------------------------
+// UTILIDADES GLOBALES DE LAYOUT
+// ----------------------------------------------------------------------------
+
+// Layout principal — los offsets del sidebar/header están en app.scss > .page-content
+
+// Contenedor de página estándar
+.page-container {
+  padding: $space-4 $space-5;   // 16px arriba/abajo · 20px lados
+  max-width: $content-max-width;
+
+  &__header {
+    @include flex-between;
+    margin-bottom: $space-6;
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+
+  &__title-group {
+    @include flex-col($space-1);
+  }
+}
+
+// Grid de KPI cards
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+// KPI card — compartido entre dashboard, métricas y usuarios
+.kpi-card {
+  @include card-compact;
+  @include flex-col($space-1);
+  align-items: flex-start;
+
+  &__value {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    line-height: $line-height-tight;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    font-weight: $font-weight-medium;
+  }
+
+  &--active    { border-left: 4px solid $color-warning; .kpi-card__value { color: $color-warning; } }
+  &--completed { border-left: 4px solid $color-success; .kpi-card__value { color: $color-success; } }
+  &--rejected  { border-left: 4px solid $color-danger;  .kpi-card__value { color: $color-danger; } }
+  &--time      { border-left: 4px solid $color-primary-500; .kpi-card__value { color: $color-primary-600; } }
+}
+
+// Espaciados de sección
+.section {
+  @include card;
+  margin-bottom: $space-6;
+
+  &__header {
+    @include flex-between;
+    margin-bottom: $space-4;
+    padding-bottom: $space-4;
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+// Auth layout — centrado sin sidebar
+.auth-layout {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-secondary-900 0%, $color-secondary-800 40%, $color-primary-700 100%);
+  padding: $space-4;
+}

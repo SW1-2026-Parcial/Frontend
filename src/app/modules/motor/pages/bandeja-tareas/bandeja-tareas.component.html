@@ -1,0 +1,176 @@
+<div class="bandeja">
+
+  <div class="bandeja__header">
+    <div class="bandeja__title-area">
+      <h1 class="bandeja__title">Bandeja de tareas</h1>
+      <p class="bandeja__subtitle">Tareas disponibles en tu departamento y asignadas a ti</p>
+    </div>
+    <div class="bandeja__actions">
+      <button pButton pRipple type="button"
+        label="Actualizar" icon="pi pi-refresh"
+        class="p-button-outlined p-button-secondary p-button-sm"
+        (click)="actualizar()"
+        [disabled]="loading"
+        pTooltip="La bandeja se actualiza automáticamente vía WebSocket"
+      ></button>
+      <!-- Spinner sutil durante recargas de fondo (no en la carga inicial) -->
+      <p-progressSpinner
+        *ngIf="loading && !loadingInicial"
+        [style]="{ width: '18px', height: '18px' }"
+        styleClass="bandeja__refresh-spinner">
+      </p-progressSpinner>
+      <span *ngIf="!loading" class="ws-indicator" title="Actualización en tiempo real activa">
+        <i class="pi pi-wifi" style="color: var(--p-green-500); font-size: 14px;"></i>
+      </span>
+      <button pButton pRipple type="button"
+        label="Nuevo trámite" icon="pi pi-plus"
+        class="p-button-primary p-button-sm"
+        (click)="iniciarTramite()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Spinner de carga inicial (solo la primera vez, oculta los tabs) -->
+  <div *ngIf="loadingInicial" class="bandeja__loading">
+    <p-progressSpinner [style]="{ width: '36px', height: '36px' }"></p-progressSpinner>
+    <span>Cargando tareas…</span>
+  </div>
+
+  <!-- Búsqueda y tabs: visibles desde que llegan los primeros datos -->
+  <ng-container *ngIf="!loadingInicial">
+
+    <div class="bandeja__busqueda">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text"
+          [(ngModel)]="textoBusqueda"
+          placeholder="Buscar por ticket, proceso o actividad…"
+          class="bandeja__search-input"/>
+      </span>
+      <button *ngIf="textoBusqueda"
+        pButton pRipple type="button"
+        icon="pi pi-times"
+        class="p-button-text p-button-secondary p-button-sm"
+        pTooltip="Limpiar búsqueda"
+        (click)="textoBusqueda = ''">
+      </button>
+    </div>
+
+    <!-- Tabs — siempre montados para conservar tabActivo tras recargas de fondo -->
+    <p-tabs [(value)]="tabActivo" class="bandeja__tabs">
+
+      <p-tablist>
+        <p-tab value="0">
+          <span class="tab-label">
+            {{ esSupervisor ? 'Todos los departamentos' : 'Disponibles' }}
+            <span *ngIf="tareasDisponibles.length" class="tab-badge tab-badge--danger">
+              {{ tareasDisponibles.length }}
+            </span>
+          </span>
+        </p-tab>
+        <p-tab value="1">
+          <span class="tab-label">
+            Mis tareas
+            <span *ngIf="misTareas.length" class="tab-badge tab-badge--warning">
+              {{ misTareas.length }}
+            </span>
+          </span>
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+
+        <!-- Panel: Disponibles / Todos los departamentos -->
+        <p-tabpanel value="0">
+          <div *ngIf="tareasDisponibles.length" class="tareas-list">
+            <div *ngFor="let tarea of tareasDisponibles" class="tarea-card tarea-card--disponible">
+              <div class="tarea-card__main">
+                <div class="tarea-card__info">
+                  <span class="tarea-card__ticket">
+                    {{ tarea.tramiteTicket || ('ID: ' + (tarea.tramiteId | slice:0:8)) }}
+                  </span>
+                  <span class="tarea-card__sep">·</span>
+                  <span class="tarea-card__politica">{{ tarea.politicaNombre ?? 'Trámite' }}</span>
+                </div>
+                <h3 class="tarea-card__nombre">{{ tarea.nodoNombre ?? 'Actividad' }}</h3>
+                <div class="tarea-card__meta">
+                  <span class="tarea-card__depto">
+                    <i class="pi pi-building"></i> {{ tarea.departamentoNombre ?? 'Departamento' }}
+                  </span>
+                  <span class="tarea-card__fecha">
+                    <i class="pi pi-clock"></i> {{ tarea.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
+                </div>
+              </div>
+              <div class="tarea-card__side">
+                <app-sp1-badge [estado]="tarea.prioridad ?? 'MEDIUM'"></app-sp1-badge>
+                <button pButton pRipple type="button"
+                  label="Tomar" icon="pi pi-hand-pointer"
+                  class="p-button-primary p-button-sm"
+                  [loading]="tomandoId === tarea.id"
+                  [disabled]="!!tomandoId"
+                  (click)="tomar(tarea)"
+                  pTooltip="Asignarme esta tarea"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <app-sp1-empty-state
+            *ngIf="!tareasDisponibles.length"
+            icon="pi-inbox"
+            title="Sin tareas disponibles"
+            [message]="esSupervisor
+              ? 'No hay tareas pendientes en ningún departamento en este momento.'
+              : 'No hay tareas pendientes en tu departamento en este momento.'"
+          ></app-sp1-empty-state>
+        </p-tabpanel>
+
+        <!-- Panel: Mis tareas -->
+        <p-tabpanel value="1">
+          <div *ngIf="misTareas.length" class="tareas-list">
+            <div *ngFor="let tarea of misTareas" class="tarea-card tarea-card--tomada">
+              <div class="tarea-card__main">
+                <div class="tarea-card__info">
+                  <span class="tarea-card__ticket">{{ tarea.tramiteTicket || ('ID: ' + (tarea.tramiteId | slice:0:8)) }}</span>
+                  <span class="tarea-card__sep">·</span>
+                  <span class="tarea-card__politica">{{ tarea.politicaNombre ?? 'Trámite' }}</span>
+                </div>
+                <h3 class="tarea-card__nombre">{{ tarea.nodoNombre ?? 'Actividad' }}</h3>
+                <div class="tarea-card__meta">
+                  <span class="tarea-card__depto">
+                    <i class="pi pi-building"></i> {{ tarea.departamentoNombre ?? 'Departamento' }}
+                  </span>
+                  <span class="tarea-card__fecha">
+                    <i class="pi pi-clock"></i> {{ tarea.updatedAt | date:'dd/MM HH:mm' }}
+                  </span>
+                </div>
+              </div>
+              <div class="tarea-card__side">
+                <app-sp1-badge [estado]="tarea.prioridad ?? 'MEDIUM'"></app-sp1-badge>
+                <button pButton pRipple type="button"
+                  label="Continuar" icon="pi pi-arrow-right"
+                  iconPos="right"
+                  class="p-button-warning p-button-sm"
+                  (click)="continuar(tarea)"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <app-sp1-empty-state
+            *ngIf="!misTareas.length"
+            icon="pi-check-circle"
+            title="Sin tareas activas"
+            message="No tienes tareas tomadas. Ve a «Disponibles» para tomar una."
+          ></app-sp1-empty-state>
+        </p-tabpanel>
+
+      </p-tabpanels>
+    </p-tabs>
+
+  </ng-container>
+
+</div>
+
+<p-toast position="top-right"></p-toast>

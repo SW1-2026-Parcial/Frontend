@@ -1,0 +1,239 @@
+// _light.scss — Tema claro PrimeNG Aura → paleta corporativa sp1
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+:root {
+  color-scheme: light only;
+
+  --p-primary-color: #{$color-primary-500};
+  --p-primary-color-text: #ffffff;
+
+  --p-surface-0:   #{$color-bg-card};
+  --p-surface-50:  #{$color-secondary-50};
+  --p-surface-100: #{$color-secondary-100};
+  --p-surface-200: #{$color-secondary-200};
+  --p-surface-300: #{$color-secondary-300};
+  --p-surface-400: #{$color-secondary-400};
+  --p-surface-500: #{$color-secondary-500};
+  --p-surface-600: #{$color-secondary-600};
+  --p-surface-700: #{$color-secondary-700};
+  --p-surface-800: #{$color-secondary-800};
+  --p-surface-900: #{$color-secondary-900};
+
+  --p-content-background:       #{$color-bg-card};
+  --p-content-hover-background: #{$color-secondary-50};
+  --p-content-border-color:     #{$color-border};
+  --p-content-color:            #{$color-text-primary};
+
+  --p-text-color:           #{$color-text-primary};
+  --p-text-color-secondary: #{$color-text-secondary};
+  --p-text-muted-color:     #{$color-text-muted};
+
+  --p-border-color:          #{$color-border};
+  --p-border-radius:         #{$border-radius-md};
+  --p-content-border-radius: #{$border-radius-md};
+  --p-focus-ring-color:      #{rgba($color-primary-500, 0.25)};
+
+  --p-overlay-select-shadow:  #{$shadow-md};
+  --p-overlay-popover-shadow: #{$shadow-lg};
+  --p-overlay-modal-shadow:   #{$shadow-xl};
+
+  --p-toolbar-background:   #{$color-bg-card};
+  --p-toolbar-border-color: #{$color-border};
+  --p-toolbar-color:        #{$color-text-primary};
+
+  --p-tree-background:               #{$color-bg-card};
+  --p-tree-color:                    #{$color-text-primary};
+  --p-tree-node-color:               #{$color-text-primary};
+  --p-tree-node-hover-background:    #{$color-secondary-50};
+  --p-tree-node-hover-color:         #{$color-text-primary};
+  --p-tree-node-selected-background: #{$color-primary-50};
+  --p-tree-node-selected-color:      #{$color-primary-700};
+  --p-tree-node-icon-color:          #{$color-text-muted};
+  --p-tree-node-icon-hover-color:    #{$color-text-secondary};
+  --p-tree-node-icon-selected-color: #{$color-primary-500};
+
+  --p-form-field-background:        #{$color-bg-card};
+  --p-form-field-color:             #{$color-text-primary};
+  --p-form-field-border-color:      #{$color-border};
+  --p-form-field-placeholder-color: #{$color-text-muted};
+  --p-form-field-hover-border-color:  #{$color-border-strong};
+  --p-form-field-focus-border-color:  #{$color-primary-500};
+  --p-form-field-disabled-background: #{$color-secondary-100};
+  --p-form-field-disabled-color:      #{$color-text-muted};
+
+  --p-card-background:   #{$color-bg-card};
+  --p-card-color:        #{$color-text-primary};
+  --p-card-border-color: #{$color-border};
+
+  --p-select-background:          #{$color-bg-card};
+  --p-select-filled-background:   #{$color-secondary-50};
+  --p-select-border-color:        #{$color-border};
+  --p-select-hover-border-color:  #{$color-border-strong};
+  --p-select-focus-border-color:  #{$color-primary-500};
+  --p-select-color:               #{$color-text-primary};
+  --p-select-placeholder-color:   #{$color-text-muted};
+  --p-select-dropdown-color:      #{$color-text-secondary};
+  --p-select-disabled-background: #{$color-secondary-100};
+  --p-select-disabled-color:      #{$color-text-muted};
+
+  --p-select-overlay-background:   #{$color-bg-card};
+  --p-select-overlay-color:        #{$color-text-primary};
+  --p-select-overlay-border-color: #{$color-border};
+  --p-select-overlay-shadow:       #{$shadow-md};
+
+  --p-select-option-color:                #{$color-text-primary};
+  --p-select-option-focus-background:     #{$color-secondary-50};
+  --p-select-option-focus-color:          #{$color-text-primary};
+  --p-select-option-selected-background:  #{$color-primary-50};
+  --p-select-option-selected-color:       #{$color-primary-700};
+  --p-select-option-selected-focus-background: #{$color-primary-100};
+  --p-select-option-selected-focus-color: #{$color-primary-700};
+}
+
+.p-button {
+  font-family: $font-family-base !important;
+  font-weight: $font-weight-medium !important;
+}
+
+.p-datatable {
+  border-color: $color-border;
+
+  .p-datatable-header {
+    background: $color-bg-card;
+    color: $color-text-primary;
+    border-color: $color-border;
+  }
+
+  .p-datatable-thead > tr > th {
+    background: $color-bg-card;
+    color: $color-text-primary;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-color: $color-border;
+    padding: $space-3 $space-4;
+  }
+
+  .p-datatable-tbody > tr {
+    background: $color-bg-card !important;
+    color: $color-text-primary;
+    transition: background-color $transition-fast, color $transition-fast;
+    > td { font-size: $font-size-sm; color: inherit; border-color: $color-border; padding: $space-3 $space-4; }
+  }
+
+  &.p-datatable-hoverable .p-datatable-tbody > tr:not(.p-datatable-row-selected):hover {
+    background: $color-secondary-900 !important;
+    color: $color-text-inverse !important;
+    > td { color: inherit !important; }
+    .p-button.p-button-text { color: $color-text-inverse !important; }
+  }
+
+  .p-datatable-tbody > tr.p-datatable-row-selected {
+    background: $color-primary-50 !important;
+    color: $color-text-primary !important;
+    > td { color: inherit !important; }
+  }
+
+  .p-paginator {
+    background: $color-bg-card;
+    border-top: 1px solid $color-border;
+    color: $color-text-primary;
+  }
+}
+
+.p-dialog {
+  border: 1px solid $color-border;
+  box-shadow: $shadow-xl;
+  .p-dialog-header { background: $color-bg-card !important; color: $color-text-primary !important; border-bottom: 1px solid $color-border; padding: $space-5 $space-6; }
+  .p-dialog-title { color: $color-text-primary !important; }
+  .p-dialog-header-actions .p-button { color: $color-text-secondary !important; }
+  .p-dialog-content { background: $color-bg-card !important; color: $color-text-primary !important; padding: $space-6; }
+  .p-dialog-footer { background: $color-secondary-50 !important; color: $color-text-primary !important; border-top: 1px solid $color-border; padding: $space-4 $space-6; }
+}
+
+.p-dialog.p-confirm-dialog,
+.p-confirm-dialog {
+  .p-dialog-header, .p-dialog-content, .p-dialog-footer {
+    background: $color-bg-card !important;
+    color: $color-text-primary !important;
+  }
+}
+
+.p-inputtext {
+  font-family: $font-family-base !important;
+  font-size: $font-size-sm !important;
+  color: $color-text-primary !important;
+  background: $color-bg-card !important;
+  &::placeholder { color: $color-text-muted !important; }
+}
+
+.p-toolbar {
+  background: $color-bg-card !important;
+  border: 1px solid $color-border !important;
+  color: $color-text-primary !important;
+  h1, h2, h3, h4, h5, h6 { color: $color-text-primary !important; }
+}
+
+.p-tree {
+  background: $color-bg-card !important;
+  border: 1px solid $color-border !important;
+  border-radius: $border-radius-lg;
+  color: $color-text-primary !important;
+
+  .p-tree-filter-input {
+    background: $color-bg-card !important; color: $color-text-primary !important; border-color: $color-border !important;
+    &::placeholder { color: $color-text-muted !important; }
+  }
+  .p-tree-filter-container { background: $color-bg-card !important; border-bottom: 1px solid $color-border; }
+  .p-tree-node-label, .p-tree-node-content { color: $color-text-primary !important; }
+  .p-tree-node-content {
+    border-radius: $border-radius-md;
+    &:hover { background: $color-secondary-50 !important; color: $color-text-primary !important; }
+    &.p-tree-node-selected, &[aria-selected="true"] {
+      background: $color-primary-50 !important; color: $color-primary-700 !important;
+      .p-tree-node-label { color: $color-primary-700 !important; font-weight: $font-weight-medium; }
+    }
+  }
+  .p-tree-node-toggle-button { color: $color-text-muted !important; background: transparent !important; &:hover { color: $color-text-primary !important; } }
+  .p-tree-node-icon { color: $color-text-secondary !important; }
+}
+
+.p-select {
+  background: $color-bg-card !important;
+  border-color: $color-border !important;
+  .p-select-label { color: $color-text-primary !important; font-size: $font-size-sm; font-family: $font-family-base; &.p-placeholder { color: $color-text-muted !important; } }
+  .p-select-dropdown { color: $color-text-secondary !important; }
+}
+
+.p-select-overlay {
+  background: $color-bg-card !important;
+  border: 1px solid $color-border !important;
+  color: $color-text-primary !important;
+  box-shadow: $shadow-md;
+  .p-select-header, .p-select-filter-container { background: $color-bg-card !important; }
+  input.p-select-filter, .p-inputtext { background: $color-bg-card !important; color: $color-text-primary !important; border-color: $color-border !important; &::placeholder { color: $color-text-muted !important; } }
+  .p-select-list-container { background: $color-bg-card !important; }
+  .p-select-option {
+    color: $color-text-primary !important; font-size: $font-size-sm; font-family: $font-family-base; background: transparent;
+    &:hover, &.p-focus:not(.p-select-option-selected) { background: $color-secondary-50 !important; color: $color-text-primary !important; }
+    &.p-select-option-selected { background: $color-primary-50 !important; color: $color-primary-700 !important; }
+  }
+  .p-select-empty-message { color: $color-text-muted; font-size: $font-size-sm; padding: $space-4; text-align: center; }
+}
+
+.p-skeleton { background: $color-secondary-100; border-radius: $border-radius-md; }
+.p-progressspinner-circle { stroke: $color-primary-500 !important; }
+.p-toast .p-toast-message { border-radius: $border-radius-lg; box-shadow: $shadow-lg; }
+.p-tag { border-radius: $border-radius-full; font-size: $font-size-xs; font-weight: $font-weight-semibold; }
+
+.p-tabs {
+  .p-tablist { background: $color-bg-card; color: $color-text-primary; }
+  .p-tabpanels { background: $color-bg-card; color: $color-text-primary; }
+  .p-tab {
+    color: $color-text-secondary !important;
+    &:hover { color: $color-text-primary !important; background: $color-secondary-50 !important; }
+    &[aria-selected="true"], &.p-tab-active { color: $color-primary-500 !important; }
+  }
+}

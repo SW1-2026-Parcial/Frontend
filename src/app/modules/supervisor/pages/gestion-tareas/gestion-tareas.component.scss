@@ -1,0 +1,168 @@
+@use 'abstracts' as *;
+
+.gt {
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: $space-1 0 0;
+  }
+
+  &__filtros {
+    @include flex-row($space-3);
+    align-items: center;
+    margin-bottom: $space-5;
+  }
+
+  &__search {
+    width: 360px;
+    font-size: $font-size-sm;
+  }
+
+  &__count {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-left: auto;
+  }
+
+  &__loading {
+    @include flex-col($space-3);
+    align-items: center;
+    justify-content: center;
+    padding: $space-10 0;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+  }
+
+  &__list {
+    @include flex-col($space-3);
+  }
+}
+
+// ── Card de tarea ─────────────────────────────────────────────────────────────
+
+.gt-card {
+  @include card;
+  display: flex;
+  align-items: flex-start;
+  gap: $space-4;
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    @include flex-col($space-1);
+  }
+
+  &__top {
+    @include flex-row($space-2);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__ticket {
+    font-family: ui-monospace, monospace;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    color: $color-primary-600;
+  }
+
+  &__proceso {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    @include truncate;
+  }
+
+  &__nombre {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__meta {
+    @include flex-row($space-3);
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    flex-wrap: wrap;
+    gap: $space-1;
+
+    span { @include flex-row($space-1); }
+  }
+
+  &__actions {
+    @include flex-row($space-2);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+// ── Dialogs ───────────────────────────────────────────────────────────────────
+
+.dlg-body {
+  @include flex-col($space-3);
+}
+
+.dlg-info {
+  @include flex-row($space-2);
+  align-items: center;
+  padding: $space-2 $space-3;
+  background: $color-secondary-50;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+
+  &__ticket {
+    font-family: ui-monospace, monospace;
+    font-weight: $font-weight-bold;
+    color: $color-primary-600;
+  }
+
+  &__sep { color: $color-text-muted; }
+
+  &__nodo {
+    color: $color-text-secondary;
+    @include truncate;
+  }
+}
+
+.dlg-warn {
+  @include flex-row($space-2);
+  align-items: flex-start;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: rgba(249, 115, 22, 0.06);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  border-radius: $border-radius-md;
+  padding: $space-3;
+  margin: 0;
+  line-height: $line-height-normal;
+}
+
+.dlg-loading {
+  @include flex-row($space-2);
+  align-items: center;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  padding: $space-2 0;
+}
+
+.dlg-user-opt {
+  @include flex-col(2px);
+
+  &__nombre {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+  }
+
+  &__depto {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+}

@@ -1,0 +1,57 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: width }"
+  [breakpoints]="{ '768px': '95vw' }"
+  [contentStyle]="{ padding: '0' }"
+  (onHide)="onHide()"
+  styleClass="sp1-dialog"
+  [ngClass]="{ 'sp1-dialog--danger': type === 'danger' }"
+>
+  <!-- Header personalizado -->
+  <ng-template pTemplate="header">
+    <div class="sp1-dialog__header">
+      <div class="sp1-dialog__header-icon" *ngIf="type === 'danger'">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <div class="sp1-dialog__header-text">
+        <h3 class="sp1-dialog__title">{{ title }}</h3>
+        <p class="sp1-dialog__subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Contenido dinámico -->
+  <div class="sp1-dialog__body">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Footer con acciones -->
+  <ng-template pTemplate="footer" *ngIf="showFooter">
+    <div class="sp1-dialog__footer">
+      <button
+        pButton
+        pRipple
+        type="button"
+        [label]="cancelLabel"
+        icon="pi pi-times"
+        class="p-button-text p-button-secondary"
+        (click)="onCancel()"
+        [disabled]="loading"
+      ></button>
+      <button
+        pButton
+        pRipple
+        type="button"
+        [label]="confirmLabel"
+        [icon]="loading ? 'pi pi-spin pi-spinner' : confirmIcon"
+        [class]="confirmClass"
+        (click)="onConfirm()"
+        [disabled]="loading || confirmDisabled"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

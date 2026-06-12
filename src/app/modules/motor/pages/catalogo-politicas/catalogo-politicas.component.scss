@@ -1,0 +1,105 @@
+@use 'abstracts' as *;
+
+.catalogo {
+  padding: $space-6;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  &__header {
+    @include flex-between;
+    align-items: flex-start;
+    margin-bottom: $space-6;
+    gap: $space-4;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin: 0 0 $space-1;
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__search-input {
+    width: 280px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $space-4;
+  }
+}
+
+// ── Card de política ──────────────────────────────────────────────────────────
+
+.policy-card {
+  @include card;
+  @include flex-col($space-3);
+  cursor: pointer;
+  transition: box-shadow $transition-fast, transform $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+    border-color: $color-primary-200;
+  }
+
+  &--skeleton {
+    cursor: default;
+    &:hover { transform: none; box-shadow: $shadow-sm; }
+  }
+
+  &__header {
+    @include flex-between;
+    align-items: center;
+  }
+
+  &__badge {
+    @include flex-row($space-1);
+    align-items: center;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: #065f46;
+    background: #d1fae5;
+    padding: 3px 10px;
+    border-radius: $border-radius-full;
+
+    i { font-size: 10px; }
+  }
+
+  &__version {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    background: $color-secondary-100;
+    padding: 2px 8px;
+    border-radius: $border-radius-full;
+  }
+
+  &__name {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+    line-height: $line-height-tight;
+  }
+
+  &__desc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+    line-height: $line-height-normal;
+    flex: 1;
+    @include truncate;
+  }
+
+  &__footer {
+    margin-top: auto;
+  }
+}

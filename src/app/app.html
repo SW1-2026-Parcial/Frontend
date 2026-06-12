@@ -1,0 +1,15 @@
+<ng-container *ngIf="mostrarShell; else sinShell">
+  <div class="app-shell">
+    <app-sidebar [collapsed]="sidebarCollapsed" (collapseChange)="sidebarCollapsed = $event"></app-sidebar>
+    <div class="app-shell__main" [class.sidebar-collapsed]="sidebarCollapsed">
+      <app-header [sidebarCollapsed]="sidebarCollapsed"></app-header>
+      <div class="page-content">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #sinShell>
+  <router-outlet></router-outlet>
+</ng-template>

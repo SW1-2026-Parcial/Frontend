@@ -1,0 +1,57 @@
+<p-toast />
+
+<div class="editor-page">
+  <!-- Header -->
+  <div class="editor-header">
+    <p-button
+      icon="pi pi-arrow-left"
+      label="Volver al repositorio"
+      [text]="true"
+      (onClick)="volver()"
+    />
+    <span class="doc-name" *ngIf="nombreDoc">
+      <i class="pi pi-file-edit mr-2"></i>{{ nombreDoc }}
+    </span>
+    <p-button
+      icon="pi pi-info-circle"
+      label="Info / Permisos"
+      [text]="true"
+      severity="secondary"
+      (onClick)="showDetalle = true"
+      pTooltip="Ver información, historial y permisos del documento"
+      styleClass="ml-auto"
+    />
+  </div>
+
+  <!-- Loading -->
+  <div class="editor-loading" *ngIf="loading">
+    <p-progressBar mode="indeterminate" [style]="{ height: '4px' }" />
+    <p class="text-center mt-3 text-color-secondary">Cargando editor colaborativo...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="editor-error" *ngIf="error">
+    <i class="pi pi-exclamation-triangle text-4xl text-orange-500 mb-3"></i>
+    <p>{{ error }}</p>
+    <p-button label="Volver al repositorio" icon="pi pi-arrow-left" (onClick)="volver()" />
+  </div>
+
+  <!-- Editor Container -->
+  <div
+    #editorContainer
+    id="onlyoffice-editor"
+    class="editor-frame"
+    [class.hidden]="loading || error"
+  ></div>
+</div>
+
+<!-- Drawer: info, historial y permisos del documento -->
+<p-drawer
+  [(visible)]="showDetalle"
+  position="right"
+  [style]="{ width: '28rem' }"
+  header="Información del Documento">
+  <app-documento-detalle
+    *ngIf="showDetalle && documentoId"
+    [documentoId]="documentoId" />
+</p-drawer>

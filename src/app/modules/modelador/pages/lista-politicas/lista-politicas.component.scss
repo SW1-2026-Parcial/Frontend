@@ -1,0 +1,13 @@
+@use 'abstracts' as *;
+
+.form-nueva-politica {
+  @include flex-col($space-4);
+}
+
+.form-field-group {
+  @include flex-col($space-1);
+
+  input, textarea {
+    width: 100%;
+  }
+}

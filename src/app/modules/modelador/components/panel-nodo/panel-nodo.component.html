@@ -1,0 +1,138 @@
+<aside class="panel-nodo" role="complementary" aria-label="Propiedades del nodo">
+
+  <!-- Sin nodo seleccionado -->
+  <div *ngIf="!nodo" class="panel-nodo__empty">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5">
+      <path d="M15 10l-4 4 4 4M3 12h16"/>
+    </svg>
+    <p>Selecciona un nodo en el canvas</p>
+  </div>
+
+  <!-- Nodo seleccionado -->
+  <ng-container *ngIf="nodo">
+
+    <div class="panel-nodo__header">
+      <div class="panel-nodo__header-info">
+        <span class="panel-nodo__tipo-tag panel-nodo__tipo-tag--{{ nodo.tipoNodo.toLowerCase() }}">
+          {{ nodo.tipoNodo }}
+        </span>
+        <h3 class="panel-nodo__title">{{ nodo.etiqueta || 'Sin nombre' }}</h3>
+      </div>
+      <button class="panel-nodo__close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <form *ngIf="form" [formGroup]="form" (ngSubmit)="guardar()" class="panel-nodo__form" novalidate>
+
+      <!-- Etiqueta -->
+      <div class="panel-field">
+        <label class="label-field">Nombre <span class="text-danger">*</span></label>
+        <input pInputText formControlName="etiqueta" style="width:100%"
+               placeholder="Ej: Revisar documentos"/>
+        <small *ngIf="form.get('etiqueta')?.invalid && form.get('etiqueta')?.touched"
+               class="form-error">Mínimo 2 caracteres</small>
+      </div>
+
+      <!-- ── Solo ACTIVITY: instrucciones + formulario ── -->
+      <ng-container *ngIf="esActivity">
+
+        <div class="panel-sep"></div>
+
+        <!-- Instrucción de avance -->
+        <div class="panel-field">
+          <label class="label-field">Instrucción de avance</label>
+          <textarea pInputTextarea formControlName="instruccionAvance"
+            rows="2" style="width:100%; resize:vertical"
+            placeholder="¿Cuándo debe completar la tarea el Funcionario?"></textarea>
+          <small class="form-hint">Texto guía — no se evalúa automáticamente</small>
+        </div>
+
+        <!-- Instrucción de rechazo -->
+        <div class="panel-field">
+          <label class="label-field">Instrucción de rechazo</label>
+          <textarea pInputTextarea formControlName="instruccionRechazo"
+            rows="2" style="width:100%; resize:vertical"
+            placeholder="¿Cuándo debe rechazar la tarea el Funcionario?"></textarea>
+        </div>
+
+        <div class="panel-sep"></div>
+
+        <!-- Campos del formulario dinámico -->
+        <div class="panel-section-title">Campos del formulario</div>
+
+        <div formArrayName="campos" class="panel-campos"
+             appSortablejs
+             [appSortablejsOptions]="{ animation: 150, handle: '.campo-grip' }"
+             (sortablejsEnd)="reordenarCampo($event.oldIndex, $event.newIndex)">
+          <div
+            *ngFor="let campo of camposArray.controls; let i = index"
+            [formGroupName]="i"
+            class="panel-campo"
+          >
+            <div class="panel-campo__header">
+              <span class="campo-grip" title="Arrastrar para reordenar" style="cursor:grab;color:#9ca3af;margin-right:6px;user-select:none;">⠿</span>
+              <span class="panel-campo__idx">Campo {{ i + 1 }}</span>
+              <button type="button" class="panel-campo__del" (click)="quitarCampo(i)"
+                      aria-label="Eliminar campo">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="panel-campo__row">
+              <div class="panel-field panel-field--half">
+                <label [for]="'nombre-' + i" class="label-field">Nombre interno</label>
+                <input [id]="'nombre-' + i" pInputText formControlName="nombre"
+                       placeholder="nombre_campo" style="width:100%"/>
+              </div>
+              <div class="panel-field panel-field--half">
+                <label [for]="'etiqueta-' + i" class="label-field">Etiqueta</label>
+                <input [id]="'etiqueta-' + i" pInputText formControlName="etiqueta"
+                       placeholder="Label visible" style="width:100%"/>
+              </div>
+            </div>
+
+            <div class="panel-campo__row">
+              <div class="panel-field panel-field--half">
+                <label [for]="'tipo-' + i" class="label-field">Tipo</label>
+                <p-select [inputId]="'tipo-' + i" formControlName="tipo"
+                  [options]="tiposCampo" optionLabel="label" optionValue="value"
+                  styleClass="w-full" appendTo="body"></p-select>
+              </div>
+              <div class="panel-field panel-field--half panel-field--inline" style="padding-top:20px">
+                <p-checkbox [inputId]="'req-' + i" formControlName="requerido" [binary]="true"></p-checkbox>
+                <label [for]="'req-' + i" class="label-field" style="margin:0;cursor:pointer">Requerido</label>
+              </div>
+            </div>
+
+            <div class="panel-field" *ngIf="campo.get('tipo')?.value === 'SELECT'">
+              <label [for]="'opciones-' + i" class="label-field">Opciones (una por línea)</label>
+              <textarea [id]="'opciones-' + i" pInputTextarea formControlName="opciones"
+                rows="3" style="width:100%" placeholder="Opción 1&#10;Opción 2"></textarea>
+            </div>
+
+          </div><!-- /panel-campo -->
+        </div><!-- /panel-campos -->
+
+        <button type="button" pButton pRipple
+          label="Agregar campo" icon="pi pi-plus"
+          class="p-button-outlined p-button-sm w-full"
+          (click)="agregarCampo()"></button>
+
+      </ng-container><!-- /esActivity -->
+
+      <div class="panel-sep"></div>
+
+      <button type="submit" pButton pRipple
+        label="Aplicar cambios" icon="pi pi-check"
+        class="p-button-primary w-full"></button>
+
+    </form>
+
+  </ng-container>
+
+</aside>

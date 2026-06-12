@@ -1,0 +1,82 @@
+<!-- Guard *ngIf: evita NG01052 si [form] llega undefined por timing de Angular -->
+<ng-container *ngIf="form" [formGroup]="form">
+
+  <div *ngFor="let campo of campos" class="fd-field">
+    <label class="fd-label">
+      {{ campo.etiqueta }}
+      <span *ngIf="campo.requerido" class="fd-required">*</span>
+    </label>
+
+    <!-- TEXT -->
+    <input
+      *ngIf="campo.tipo === 'TEXT'"
+      pInputText
+      [formControlName]="campo.nombre"
+      [placeholder]="campo.etiqueta"
+      [readonly]="readonly"
+      class="w-full"
+    />
+
+    <!-- NUMBER -->
+    <p-inputNumber
+      *ngIf="campo.tipo === 'NUMBER'"
+      [formControlName]="campo.nombre"
+      [placeholder]="campo.etiqueta"
+      [readonly]="readonly"
+      styleClass="w-full"
+    ></p-inputNumber>
+
+    <!-- DATE -->
+    <input
+      *ngIf="campo.tipo === 'DATE'"
+      type="date"
+      pInputText
+      [formControlName]="campo.nombre"
+      [readOnly]="readonly"
+      class="w-full"
+    />
+
+    <!-- SELECT -->
+    <p-select
+      *ngIf="campo.tipo === 'SELECT'"
+      [formControlName]="campo.nombre"
+      [options]="opcionesSelect(campo)"
+      optionLabel="label"
+      optionValue="value"
+      [placeholder]="'Seleccionar ' + campo.etiqueta"
+      styleClass="w-full"
+      appendTo="body"
+    ></p-select>
+
+    <!-- TEXTAREA -->
+    <textarea
+      *ngIf="campo.tipo === 'TEXTAREA'"
+      pInputTextarea
+      [formControlName]="campo.nombre"
+      [placeholder]="campo.etiqueta"
+      [readonly]="readonly"
+      rows="3"
+      class="w-full"
+    ></textarea>
+
+    <!-- FILE -->
+    <div *ngIf="campo.tipo === 'FILE'" class="fd-file-wrap">
+      <input
+        type="file"
+        [id]="'file-' + campo.nombre"
+        class="fd-file-input"
+        [disabled]="readonly"
+        (change)="onFileChange($event, campo.nombre)"
+      />
+      <label [for]="'file-' + campo.nombre" class="fd-file-label">
+        <i class="pi pi-upload"></i>
+        {{ form.get(campo.nombre)?.value ? form.get(campo.nombre)?.value : 'Adjuntar archivo' }}
+      </label>
+    </div>
+
+    <small *ngIf="esInvalido(campo.nombre)" class="fd-error">
+      Este campo es requerido
+    </small>
+  </div>
+
+</ng-container>

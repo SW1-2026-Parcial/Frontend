@@ -1,0 +1,226 @@
+<div class="editor">
+
+  <!-- ── Topbar ── -->
+  <div class="editor__topbar">
+    <div class="editor__topbar-left">
+      <button pButton pRipple type="button"
+        icon="pi pi-arrow-left"
+        class="p-button-text p-button-secondary p-button-sm"
+        (click)="volver()"
+        pTooltip="Volver" tooltipPosition="right">
+      </button>
+      <div class="editor__meta">
+        <h2 class="editor__nombre">{{ politica?.nombre ?? 'Cargando…' }}</h2>
+        <app-sp1-badge *ngIf="politica" [estado]="politica.estado"></app-sp1-badge>
+        <span *ngIf="versionActiva" class="editor__version-tag">
+          v{{ versionActiva.numeroVersion }}
+        </span>
+      </div>
+    </div>
+
+    <div class="editor__topbar-right">
+
+      <!-- Presencia: avatares de otros admins editando simultáneamente -->
+      <div *ngIf="presencia.length" class="editor__presencia">
+        <span *ngFor="let admin of presencia"
+          class="editor__avatar"
+          [style.background]="admin.color"
+          [pTooltip]="admin.nombre + ' (' + admin.email + ')'"
+          tooltipPosition="bottom">
+          {{ admin.nombre.charAt(0).toUpperCase() }}
+        </span>
+      </div>
+
+      <span *ngIf="!esEditable" class="editor__readonly">
+        <i class="pi pi-lock"></i> Solo lectura
+      </span>
+      <button *ngIf="esEditable"
+        pButton pRipple type="button"
+        label="Validar" icon="pi pi-check-circle"
+        class="p-button-outlined p-button-sm"
+        (click)="validar()"
+        pTooltip="Validar consistencia del diagrama (CU-05)">
+      </button>
+      <button *ngIf="puedePublicar"
+        pButton pRipple type="button"
+        label="Publicar" icon="pi pi-send"
+        class="p-button-primary p-button-sm"
+        (click)="publicar()"
+        pTooltip="Publicar política (CU-06)">
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Cuerpo: canvas ── -->
+  <div class="editor__body">
+
+    <div class="editor__canvas-area">
+
+      <!-- Spinner de carga -->
+      <div *ngIf="loadingDiagrama" class="editor__loading">
+        <p-progressSpinner [style]="{ width: '36px', height: '36px' }"></p-progressSpinner>
+        <span>Cargando diagrama…</span>
+      </div>
+
+      <!-- Paleta flotante (solo en modo edición) -->
+      <app-toolbar-diagrama
+        *ngIf="!loadingDiagrama && esEditable"
+        [modoConectar]="modoConectar"
+        [modoEliminar]="modoEliminar"
+        (accion)="onToolbarAccion($event)">
+      </app-toolbar-diagrama>
+
+      <!-- Canvas SVG -->
+      <app-canvas
+        *ngIf="!loadingDiagrama"
+        [readonly]="!esEditable"
+        [modoConectar]="modoConectar"
+        [modoEliminar]="modoEliminar"
+        (nodoCreadoRequest)="onNodoCreadoRequest($event)"
+        (conexionSolicitada)="onConexionSolicitada($event)"
+        (nodoEditarRequest)="onNodoEditarRequest($event)"
+        (calleEditarRequest)="onCalleEditarRequest($event)">
+      </app-canvas>
+
+      <!-- Micrófono (bottom-left) -->
+      <div *ngIf="!loadingDiagrama && esEditable" class="editor__mic-area">
+
+        <!-- Panel de transcripción -->
+        <div *ngIf="mostrarTranscripcion" class="mic-panel">
+          <div class="mic-panel__header">
+            <span class="mic-panel__label">
+              <i class="pi"
+                [class.pi-microphone]="micActivo"
+                [class.pi-check-circle]="!micActivo">
+              </i>
+              {{ micActivo ? 'Escuchando…' : 'Transcripción lista' }}
+            </span>
+            <button type="button" class="mic-panel__close" (click)="descartarTranscripcion()" aria-label="Descartar">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+          <p class="mic-panel__text">{{ transcripcionActual || '…' }}</p>
+          <div class="mic-panel__actions">
+            <button pButton pRipple type="button"
+              label="Descartar" icon="pi pi-trash"
+              class="p-button-text p-button-secondary p-button-sm"
+              (click)="descartarTranscripcion()">
+            </button>
+            <button pButton pRipple type="button"
+              label="Enviar a IA" icon="pi pi-sparkles"
+              class="p-button-primary p-button-sm"
+              [disabled]="!transcripcionActual.trim()"
+              (click)="enviarTranscripcionAIA()">
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón micrófono -->
+        <button type="button" class="mic-btn"
+          [class.mic-btn--active]="micActivo"
+          [class.mic-btn--unsupported]="!micSoportado"
+          (click)="toggleMicrofono()"
+          [title]="micActivo ? 'Detener grabación' : 'Describir proceso con voz'"
+          [attr.aria-label]="micActivo ? 'Detener grabación' : 'Iniciar grabación de voz'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="11" rx="3"/>
+            <path d="M5 10a7 7 0 0 0 14 0"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+          <span class="mic-btn__label">{{ micActivo ? 'Detener' : 'Voz' }}</span>
+          <span *ngIf="micActivo" class="mic-btn__pulse"></span>
+        </button>
+
+      </div>
+
+    </div><!-- /canvas-area -->
+
+    <!-- Panel de validación (derecha) -->
+    <aside *ngIf="mostrarPanelValidacion && resultadoValidacion"
+      class="editor__validation" role="complementary">
+      <div class="editor__validation-header">
+        <span class="editor__validation-title">
+          <i [class]="resultadoValidacion.valido ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+             [style.color]="resultadoValidacion.valido ? '#22c55e' : '#ef4444'">
+          </i>
+          Validación
+        </span>
+        <button pButton type="button" icon="pi pi-times"
+          class="p-button-text p-button-sm p-button-secondary"
+          (click)="mostrarPanelValidacion = false">
+        </button>
+      </div>
+      <div *ngIf="resultadoValidacion.errores.length" class="editor__validation-section">
+        <p class="editor__val-label editor__val-label--error">
+          Errores ({{ resultadoValidacion.errores.length }})
+        </p>
+        <div *ngFor="let e of resultadoValidacion.errores"
+          class="editor__val-item editor__val-item--error">
+          <code class="editor__val-code">{{ e.tipo }}</code>
+          <span>{{ e.mensaje }}</span>
+        </div>
+      </div>
+      <div *ngIf="resultadoValidacion.warnings?.length" class="editor__validation-section">
+        <p class="editor__val-label editor__val-label--warn">
+          Advertencias ({{ resultadoValidacion.warnings?.length }})
+        </p>
+        <div *ngFor="let w of resultadoValidacion.warnings"
+          class="editor__val-item editor__val-item--warn">
+          <code class="editor__val-code">{{ w.tipo }}</code>
+          <span>{{ w.mensaje }}</span>
+        </div>
+      </div>
+      <p *ngIf="!resultadoValidacion.errores.length && !resultadoValidacion.warnings?.length"
+         class="editor__val-ok">
+        Diagrama válido sin observaciones.
+      </p>
+    </aside>
+
+  </div><!-- /body -->
+
+</div><!-- /editor -->
+
+<!-- ── Dialog: propiedades del nodo seleccionado ── -->
+<p-dialog
+  [(visible)]="panelVisible"
+  [modal]="true"
+  [showHeader]="false"
+  [style]="{ width: '480px', maxWidth: '95vw' }"
+  [closable]="false"
+  [draggable]="false"
+  styleClass="sp1-dialog sp1-dialog--nodo"
+  (onHide)="cerrarPanelNodo()">
+  <app-panel-nodo *ngIf="panelVisible" (cerrar)="cerrarPanelNodo()"></app-panel-nodo>
+</p-dialog>
+
+<!-- ── Dialog: elegir rama de conexión (nodos DECISION) ── -->
+<app-dialog-conexion
+  [visible]="mostrarDialogConexion"
+  [conexionPendiente]="conexionPendiente"
+  [loading]="loadingConexion"
+  (confirmar)="onConfirmarConexion($event)"
+  (cancelar)="onCancelarConexion()">
+</app-dialog-conexion>
+
+<!-- ── Dialog: agregar / editar swim lane ── -->
+<app-dialog-calle
+  [visible]="mostrarDialogCalle"
+  [calleEditando]="calleEditando"
+  [departamentosOpciones]="departamentosOpciones"
+  [loading]="loadingCalle"
+  (confirmar)="onConfirmarCalle($event)"
+  (cancelar)="onCancelarCalle()">
+</app-dialog-calle>
+
+<!-- ── Dialog: asistente IA (CU-04) ── -->
+<app-dialog-ia
+  [visible]="mostrarDialogIA"
+  [loading]="loadingIA"
+  [instruccionInicial]="instruccionIAInicial"
+  (confirmar)="onConfirmarIA($event)"
+  (cancelar)="onCancelarIA()">
+</app-dialog-ia>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast position="top-right"></p-toast>

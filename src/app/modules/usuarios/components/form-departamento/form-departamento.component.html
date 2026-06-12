@@ -1,0 +1,47 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="form-depto">
+
+  <div class="form-grid">
+
+    <div class="form-field form-field--full">
+      <label for="nombreDepto" class="label-field">
+        Nombre del departamento <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="nombreDepto"
+        type="text"
+        pInputText
+        formControlName="nombre"
+        placeholder="Ej: Instalación y Mantenimiento"
+        [class.ng-invalid]="esInvalido('nombre')"
+      />
+      <small *ngIf="esInvalido('nombre')" class="form-error" role="alert">{{ errorDe('nombre') }}</small>
+    </div>
+
+    <div class="form-field form-field--full">
+      <label for="descripcion" class="label-field">
+        Descripción <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <textarea
+        id="descripcion"
+        pInputTextarea
+        formControlName="descripcion"
+        placeholder="Describe las responsabilidades del departamento"
+        [autoResize]="true"
+        rows="3"
+        [class.ng-invalid]="esInvalido('descripcion')"
+        style="width: 100%"
+      ></textarea>
+      <small *ngIf="esInvalido('descripcion')" class="form-error" role="alert">{{ errorDe('descripcion') }}</small>
+    </div>
+
+  </div>
+
+  <div class="form-footer">
+    <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times"
+      class="p-button-text p-button-secondary" (click)="cancelar.emit()"></button>
+    <button pButton pRipple type="submit"
+      [label]="modoEdicion ? 'Actualizar' : 'Crear departamento'"
+      icon="pi pi-check" class="p-button-primary"></button>
+  </div>
+
+</form>

@@ -1,0 +1,30 @@
+@use 'abstracts' as *;
+
+.doc-card-content {
+  @include flex-row($space-4);
+  align-items: center;
+}
+
+.doc-icon i {
+  font-size: 2rem;
+}
+
+.doc-info {
+  flex: 1;
+  @include flex-col($space-1);
+
+  .doc-name {
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+  }
+
+  .doc-meta {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+  }
+}
+
+.doc-actions {
+  @include flex-row($space-1);
+}

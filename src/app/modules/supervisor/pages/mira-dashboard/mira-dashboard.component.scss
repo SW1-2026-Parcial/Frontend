@@ -1,0 +1,283 @@
+@use 'abstracts' as *;
+
+.mira-error {
+  @include flex-col($space-3);
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: $color-text-secondary;
+  text-align: center;
+
+  i {
+    font-size: 2.5rem;
+    color: $color-danger;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+  }
+}
+
+.mira-container {
+  padding: $space-6;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+// --- Encabezado ---
+.mira-header {
+  background: linear-gradient(135deg, $color-primary-50, $color-bg-card);
+  border: 1px solid $color-primary-100;
+  border-radius: $border-radius-lg;
+  padding: $space-5 $space-6;
+}
+
+.mira-title {
+  @include flex-row($space-4);
+  align-items: flex-start;
+
+  > i {
+    font-size: 2rem;
+    color: $color-primary-500;
+    margin-top: $space-1;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    margin: 0 0 $space-1;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: $line-height-normal;
+  }
+}
+
+// --- Cards resumen ---
+.mira-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $space-4;
+}
+
+.mira-card {
+  @include card;
+  text-align: center;
+  transition: box-shadow $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  &.score-card {
+    border-left: 4px solid;
+  }
+
+  .card-header {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+    margin-bottom: $space-2;
+  }
+
+  .card-value {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-tight;
+    color: $color-text-primary;
+  }
+
+  .card-label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-top: $space-1;
+  }
+
+  .card-desc {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    margin-top: $space-2;
+    line-height: $line-height-normal;
+    border-top: 1px solid $color-border;
+    padding-top: $space-2;
+  }
+}
+
+// --- Alertas críticas ---
+.mira-alertas {
+  background: $color-danger-light;
+  border: 1px solid rgba($color-danger, 0.3);
+  border-radius: $border-radius-lg;
+  padding: $space-4;
+
+  .alertas-header {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin-bottom: $space-3;
+  }
+
+  .alerta-item {
+    display: flex;
+    gap: $space-3;
+    align-items: baseline;
+    padding: $space-2 0;
+    border-bottom: 1px solid rgba($color-danger, 0.15);
+    font-size: $font-size-sm;
+
+    &:last-child { border-bottom: none; }
+
+    .alerta-ticket { font-weight: $font-weight-semibold; min-width: 100px; color: $color-text-primary; }
+    .alerta-tipo   { color: $color-danger; font-weight: $font-weight-medium; min-width: 120px; }
+    .alerta-desc   { color: $color-text-secondary; }
+  }
+}
+
+// --- Sección distribución de riesgos ---
+.mira-section {
+  @include card;
+
+  h3 {
+    margin: 0 0 $space-4;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    @include flex-row($space-2);
+    align-items: center;
+    color: $color-text-primary;
+  }
+}
+
+.risk-bars {
+  @include flex-col($space-3);
+}
+
+.risk-bar-item {
+  display: grid;
+  grid-template-columns: 180px 1fr 90px;
+  align-items: center;
+  gap: $space-3;
+}
+
+.risk-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.risk-bar {
+  height: 8px;
+  background: $color-secondary-100;
+  border-radius: $border-radius-full;
+  overflow: hidden;
+}
+
+.risk-fill {
+  height: 100%;
+  border-radius: $border-radius-full;
+  transition: width 0.4s ease;
+}
+
+.risk-count {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  text-align: right;
+  color: $color-text-primary;
+}
+
+// --- Tabs manuales ---
+.mira-tabs {
+  background: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+}
+
+.tab-header {
+  display: flex;
+  border-bottom: 1px solid $color-border;
+  padding: 0;
+
+  button {
+    flex: 1;
+    padding: $space-3 $space-4;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    font-family: $font-family-base;
+    color: $color-text-secondary;
+    transition: all $transition-fast;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-1;
+
+    &:hover {
+      background: $color-secondary-50;
+      color: $color-text-primary;
+    }
+
+    &.active {
+      color: $color-primary-500;
+      border-bottom: 2px solid $color-primary-500;
+      background: $color-primary-50;
+      font-weight: $font-weight-semibold;
+    }
+  }
+}
+
+.tab-badge {
+  background: $color-primary-100;
+  color: $color-primary-700;
+  border-radius: $border-radius-full;
+  padding: 0 $space-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  margin-left: $space-1;
+}
+
+.tab-description {
+  padding: $space-2 $space-5;
+  background: $color-secondary-50;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  border-bottom: 1px solid $color-border;
+}
+
+.tab-content {
+  padding: $space-4;
+}
+
+.section-desc {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin: -$space-2 0 $space-4;
+}
+
+.prioridad-badge {
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+
+  &.top3 {
+    color: $color-primary-500;
+    font-size: $font-size-base;
+  }
+}
+
+// --- Utilidades de color semántico ---
+.text-orange-500 { color: $color-warning; }
+.text-blue-500   { color: $color-primary-500; }
+.text-red-500    { color: $color-danger; }

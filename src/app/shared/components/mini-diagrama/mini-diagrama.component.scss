@@ -1,0 +1,18 @@
+@use 'abstracts' as *;
+
+.mini-diagrama-container {
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  background: $color-bg-card;
+  overflow: hidden;
+  padding: $space-2;
+
+  svg { display: block; }
+}
+
+.mini-diagrama-vacio {
+  text-align: center;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  margin: $space-4 0;
+}

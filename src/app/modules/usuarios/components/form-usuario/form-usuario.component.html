@@ -1,0 +1,122 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="form-usuario">
+
+  <div class="form-grid">
+
+    <!-- Nombre -->
+    <div class="form-field">
+      <label for="nombre" class="label-field">
+        Nombre <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="nombre"
+        type="text"
+        pInputText
+        formControlName="nombre"
+        placeholder="Ingresa el nombre"
+        [class.ng-invalid]="esInvalido('nombre')"
+        autocomplete="given-name"
+      />
+      <small *ngIf="esInvalido('nombre')" class="form-error" role="alert">
+        {{ errorDe('nombre') }}
+      </small>
+    </div>
+
+    <!-- Email -->
+    <div class="form-field form-field--full">
+      <label for="email" class="label-field">
+        Correo electrónico <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="email"
+        type="email"
+        pInputText
+        formControlName="email"
+        placeholder="usuario@empresa.com"
+        [class.ng-invalid]="esInvalido('email')"
+        autocomplete="email"
+      />
+      <small *ngIf="esInvalido('email')" class="form-error" role="alert">
+        {{ errorDe('email') }}
+      </small>
+    </div>
+
+    <!-- Rol -->
+    <div class="form-field">
+      <label for="rol" class="label-field">
+        Rol <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <p-select
+        inputId="rol"
+        formControlName="rol"
+        [options]="rolesOpciones"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecciona un rol"
+        styleClass="w-full"
+        appendTo="body"
+        [class.ng-invalid]="esInvalido('rol')"
+      ></p-select>
+      <small *ngIf="esInvalido('rol')" class="form-error" role="alert">
+        {{ errorDe('rol') }}
+      </small>
+    </div>
+
+    <!-- Departamento -->
+    <div class="form-field">
+      <label for="departamento" class="label-field">Departamento</label>
+      <p-select
+        inputId="departamento"
+        formControlName="departamentoId"
+        [options]="deptosOpciones"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sin departamento"
+        styleClass="w-full"
+        appendTo="body"
+      ></p-select>
+    </div>
+
+    <!-- Password (solo en creación) -->
+    <div class="form-field form-field--full" *ngIf="!modoEdicion">
+      <label for="password" class="label-field">
+        Contraseña inicial <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <p-password
+        inputId="password"
+        formControlName="password"
+        placeholder="Mínimo 8 caracteres"
+        [toggleMask]="true"
+        [feedback]="true"
+        styleClass="w-full"
+        [class.ng-invalid]="esInvalido('password')"
+        autocomplete="new-password"
+      ></p-password>
+      <small *ngIf="esInvalido('password')" class="form-error" role="alert">
+        {{ errorDe('password') }}
+      </small>
+    </div>
+
+  </div>
+
+  <!-- Footer del form — botones de acción -->
+  <div class="form-footer">
+    <button
+      pButton
+      pRipple
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text p-button-secondary"
+      (click)="cancelar.emit()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      type="submit"
+      [label]="modoEdicion ? 'Actualizar' : 'Crear usuario'"
+      icon="pi pi-check"
+      class="p-button-primary"
+    ></button>
+  </div>
+
+</form>

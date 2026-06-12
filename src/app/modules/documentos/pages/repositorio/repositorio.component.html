@@ -1,0 +1,235 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="repositorio-container">
+
+  <!-- Toolbar -->
+  <p-toolbar>
+    <ng-template #start>
+      <h2 class="m-0">
+        <i class="pi pi-folder-open mr-2"></i>Repositorio Documental
+      </h2>
+    </ng-template>
+    <ng-template #end>
+      <div class="flex gap-2 align-items-center">
+        <p-selectButton
+          [options]="[{ icon: 'pi pi-sitemap', value: true }, { icon: 'pi pi-list', value: false }]"
+          [(ngModel)]="vistaArbol"
+          (ngModelChange)="onVistaChange()"
+          optionValue="value"
+          size="small">
+          <ng-template let-item pTemplate="item">
+            <i [class]="item.icon"></i>
+          </ng-template>
+        </p-selectButton>
+        <p-button
+          label="Subir documento"
+          icon="pi pi-upload"
+          (onClick)="showUpload = true"
+        />
+      </div>
+    </ng-template>
+  </p-toolbar>
+
+  <!-- Buscador — solo visible en vista lista -->
+  <div class="repositorio-filtros" *ngIf="!vistaArbol">
+    <span class="p-input-icon-left repositorio-filtros__search">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        [(ngModel)]="busqueda"
+        placeholder="Buscar por nombre o extensión…"
+        class="w-full"
+      />
+    </span>
+    <span class="text-color-secondary text-sm">
+      {{ totalDocs }} documento(s) en total
+    </span>
+  </div>
+
+  <p-progressBar *ngIf="loading" mode="indeterminate" [style]="{ height: '3px' }" />
+
+  <!-- ── VISTA ÁRBOL (p-tree con endpoint /tree) ─────────────────────────── -->
+  <ng-container *ngIf="vistaArbol && !loading">
+
+    <app-sp1-empty-state
+      *ngIf="treeNodes.length === 0"
+      icon="pi-folder-open"
+      title="Sin documentos"
+      message="No hay documentos en el repositorio.">
+    </app-sp1-empty-state>
+
+    <p-tree
+      *ngIf="treeNodes.length > 0"
+      [value]="treeNodes"
+      [lazy]="true"
+      [filter]="true"
+      filterPlaceholder="Filtrar en el árbol…"
+      selectionMode="single"
+      (onNodeSelect)="onNodeSelect($event)"
+      (onNodeExpand)="onNodeExpand($event)"
+      styleClass="repo-tree">
+
+      <!-- Nodo tipo política -->
+      <ng-template let-node pTemplate="politica">
+        <div class="repo-tree-node repo-tree-node--politica">
+          <i class="pi pi-briefcase" style="color: var(--p-primary-color); font-size: 1.1rem;"></i>
+          <span class="font-semibold">{{ node.label }}</span>
+          <p-badge
+            *ngIf="node.data?.count"
+            [value]="node.data.count + ''"
+            severity="secondary"
+            styleClass="ml-2" />
+        </div>
+      </ng-template>
+
+      <!-- Nodo tipo trámite -->
+      <ng-template let-node pTemplate="tramite">
+        <div class="repo-tree-node repo-tree-node--tramite">
+          <i class="pi pi-ticket" style="color: #f97316; font-size: 1rem;"></i>
+          <span class="font-medium">{{ node.label }}</span>
+          <p-badge
+            *ngIf="node.data?.count"
+            [value]="node.data.count + ''"
+            severity="info"
+            styleClass="ml-2" />
+        </div>
+      </ng-template>
+
+      <!-- Nodo tipo documento -->
+      <ng-template let-node pTemplate="documento">
+        <div class="repo-tree-node repo-tree-node--documento">
+          <i [class]="getIcono(node.data?.extension)"
+             [style.color]="getColor(node.data?.extension)"
+             style="font-size: 1.1rem;"></i>
+          <span>{{ node.label }}</span>
+          <p-tag [value]="node.data?.extension?.toUpperCase()" severity="info" styleClass="ml-2" />
+          <span class="text-color-secondary text-sm ml-2">
+            {{ formatearTamano(node.data?.tamano || 0) }}
+          </span>
+          <div class="repo-tree-node__actions ml-auto">
+            <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info"
+              size="small" pTooltip="Ver / Editar"
+              (onClick)="abrirEditor(node.data); $event.stopPropagation()" />
+            <p-button icon="pi pi-download" [rounded]="true" [text]="true" severity="success"
+              size="small" pTooltip="Descargar"
+              (onClick)="descargar(node.data); $event.stopPropagation()" />
+            <p-button icon="pi pi-lock" [rounded]="true" [text]="true" severity="warn"
+              size="small" pTooltip="Permisos"
+              (onClick)="abrirPermisos(node.data); $event.stopPropagation()" />
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+              size="small" pTooltip="Eliminar"
+              (onClick)="confirmarEliminar(node.data); $event.stopPropagation()" />
+          </div>
+        </div>
+      </ng-template>
+
+    </p-tree>
+  </ng-container>
+
+  <!-- ── VISTA TABLA PLANA ─────────────────────────────────────────────── -->
+  <ng-container *ngIf="!vistaArbol">
+    <p-table
+      [value]="documentos"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="porPagina"
+      [totalRecords]="totalDocs"
+      [lazy]="true"
+      (onLazyLoad)="onPageChange($event)"
+      styleClass="p-datatable-sm p-datatable-striped"
+      [tableStyle]="{ 'min-width': '60rem' }"
+    >
+      <ng-template #header>
+        <tr>
+          <th style="width: 3rem"></th>
+          <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre" /></th>
+          <th pSortableColumn="extension">Tipo <p-sortIcon field="extension" /></th>
+          <th pSortableColumn="tamano">Tamaño <p-sortIcon field="tamano" /></th>
+          <th pSortableColumn="creadoEn">Fecha <p-sortIcon field="creadoEn" /></th>
+          <th>Trámite</th>
+          <th style="width: 12rem">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-doc>
+        <tr>
+          <td>
+            <i [class]="getIcono(doc.extension)" [style.color]="getColor(doc.extension)" style="font-size:1.4rem"></i>
+          </td>
+          <td class="font-semibold">{{ doc.nombre }}</td>
+          <td><p-tag [value]="doc.extension.toUpperCase()" severity="info" /></td>
+          <td>{{ formatearTamano(doc.tamano) }}</td>
+          <td>{{ doc.creadoEn | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <span *ngIf="doc.tramiteId" class="repositorio-tramite-tag">
+              <i class="pi pi-ticket" style="font-size:0.75rem"></i>
+              {{ doc.tramiteId | slice:0:8 }}…
+            </span>
+            <span *ngIf="!doc.tramiteId" class="text-color-secondary text-sm">—</span>
+          </td>
+          <td>
+            <div class="flex gap-1">
+              <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info"
+                pTooltip="Ver / Editar" (onClick)="abrirEditor(doc)" />
+              <p-button icon="pi pi-download" [rounded]="true" [text]="true" severity="success"
+                pTooltip="Descargar" (onClick)="descargar(doc)" />
+              <p-button icon="pi pi-lock" [rounded]="true" [text]="true" severity="warn"
+                pTooltip="Permisos" (onClick)="abrirPermisos(doc)" />
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                pTooltip="Eliminar" (onClick)="confirmarEliminar(doc)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="7" class="text-center p-4">
+            <i class="pi pi-folder-open text-4xl text-color-secondary mb-3 block"></i>
+            <span class="text-color-secondary">No hay documentos. Sube el primero.</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </ng-container>
+
+</div>
+
+<!-- Dialog de upload -->
+<p-dialog header="Subir Documento" [(visible)]="showUpload" [modal]="true" [style]="{ width: '500px' }">
+  <app-upload-dialog (uploaded)="onUploadComplete()" />
+</p-dialog>
+
+<!-- Drawer de detalle (info + historial + permisos) -->
+<p-drawer
+  [(visible)]="showDetalle"
+  position="right"
+  [style]="{ width: '28rem' }"
+  header="Detalle del Documento">
+  <app-documento-detalle
+    *ngIf="showDetalle && detalleDocId"
+    [documentoId]="detalleDocId"
+    (permisosActualizados)="cargar()" />
+</p-drawer>
+
+<!-- Dialog de previsualización (PDF / imágenes) -->
+<p-dialog
+  [header]="previewNombre"
+  [(visible)]="showPreview"
+  [modal]="true"
+  [maximizable]="true"
+  [style]="{ width: '90vw', height: '90vh' }"
+  (onHide)="cerrarPreview()">
+  <ng-container *ngIf="previewUrl">
+    <iframe
+      *ngIf="previewType === 'pdf'"
+      [src]="previewUrl"
+      style="width: 100%; height: calc(90vh - 120px); border: none;">
+    </iframe>
+    <div *ngIf="previewType === 'image'" style="text-align: center; overflow: auto; height: calc(90vh - 120px);">
+      <img [src]="previewUrl" [alt]="previewNombre" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+    </div>
+  </ng-container>
+</p-dialog>

@@ -1,0 +1,41 @@
+@use 'abstracts' as *;
+
+.form-usuario {
+  @include flex-col($space-4);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+
+  @include respond-to('md') {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-field {
+  @include flex-col($space-1);
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+
+  input, :host ::ng-deep .p-dropdown {
+    width: 100%;
+  }
+}
+
+.form-error {
+  color: $color-danger;
+  font-size: $font-size-xs;
+  @include flex-row($space-1);
+}
+
+.form-footer {
+  @include flex-row($space-3);
+  justify-content: flex-end;
+  padding-top: $space-4;
+  border-top: 1px solid $color-border;
+  margin-top: $space-2;
+}

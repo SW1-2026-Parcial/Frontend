@@ -1,0 +1,93 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [header]="detalle ? detalle.etiqueta : 'Detalle de tarea'"
+  [modal]="true"
+  [style]="{ width: '600px', maxWidth: '95vw' }"
+  [dismissableMask]="true"
+  (onHide)="cerrar()">
+
+  <!-- Cargando -->
+  <div *ngIf="cargando" class="flex justify-content-center p-4">
+    <p-progressSpinner strokeWidth="4" animationDuration="0.8s"></p-progressSpinner>
+  </div>
+
+  <!-- Error -->
+  <p *ngIf="error && !cargando" class="text-red-500 text-center p-4">
+    <i class="pi pi-exclamation-triangle mr-2"></i>
+    No se pudo cargar el detalle de la tarea.
+  </p>
+
+  <!-- Contenido -->
+  <div *ngIf="detalle && !cargando">
+    <!-- Metadata -->
+    <div class="flex gap-3 mb-4 flex-wrap">
+      <div *ngIf="detalle.calleNombre" class="text-sm">
+        <i class="pi pi-th-large mr-1 text-color-secondary"></i>
+        <strong>Calle:</strong> {{ detalle.calleNombre }}
+      </div>
+      <div *ngIf="detalle.completadoPor" class="text-sm">
+        <i class="pi pi-user mr-1 text-color-secondary"></i>
+        <strong>Por:</strong> {{ detalle.completadoPor.nombre }}
+      </div>
+      <div *ngIf="detalle.completadoEn" class="text-sm">
+        <i class="pi pi-calendar mr-1 text-color-secondary"></i>
+        <strong>Fecha:</strong> {{ detalle.completadoEn | date:'dd/MM/yyyy HH:mm' }}
+      </div>
+    </div>
+
+    <!-- Campos del formulario -->
+    <ng-container *ngIf="detalle.camposDefinicion && detalle.camposDefinicion.length > 0; else sinCampos">
+      <h4 class="text-sm font-semibold text-color-secondary mb-2">Datos del formulario</h4>
+      <div *ngFor="let campo of detalle.camposDefinicion"
+           class="mb-3 p-3 surface-100 border-round">
+
+        <label class="text-xs text-color-secondary block mb-1">{{ campo.etiqueta }}</label>
+
+        <!-- FILE: botón de descarga -->
+        <ng-container *ngIf="campo.tipo === 'FILE'">
+          <ng-container *ngIf="getArchivoInfo(campo.nombre) as archivo">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-file text-primary"></i>
+              <span class="text-sm">{{ archivo.nombreArchivo }}</span>
+              <p-button
+                label="Descargar"
+                icon="pi pi-download"
+                severity="info"
+                size="small"
+                [text]="true"
+                (onClick)="descargarArchivo(archivo.downloadUrl, archivo.nombreArchivo)">
+              </p-button>
+            </div>
+          </ng-container>
+          <span *ngIf="!getArchivoInfo(campo.nombre)" class="text-sm text-color-secondary">
+            Sin archivo
+          </span>
+        </ng-container>
+
+        <!-- BUTTON: estado de confirmación -->
+        <ng-container *ngIf="campo.tipo === 'BUTTON'">
+          <span class="text-sm"
+                [ngClass]="getValorCampo(campo.accionClave!) ? 'text-green-600' : 'text-color-secondary'">
+            <i [ngClass]="getValorCampo(campo.accionClave!) ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+               class="mr-1"></i>
+            {{ getValorCampo(campo.accionClave!) ? 'Confirmado' : 'No confirmado' }}
+          </span>
+        </ng-container>
+
+        <!-- Resto de tipos: valor plano -->
+        <ng-container *ngIf="campo.tipo !== 'FILE' && campo.tipo !== 'BUTTON'">
+          <span class="text-sm">{{ getValorCampo(campo.nombre) ?? '—' }}</span>
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <ng-template #sinCampos>
+      <p class="text-sm text-color-secondary">Esta tarea no tiene campos de formulario.</p>
+    </ng-template>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cerrar" severity="secondary" (onClick)="cerrar()"></p-button>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,463 @@
+@use 'abstracts' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  // ── Topbar ────────────────────────────────────────────────────────────────
+
+  &__topbar {
+    @include flex-between;
+    padding: $space-2 $space-4;
+    background: $color-bg-card;
+    border-bottom: 1px solid $color-border;
+    flex-shrink: 0;
+    min-height: 52px;
+
+    &-left  { @include flex-row($space-3); align-items: center; overflow: hidden; }
+    &-right { @include flex-row($space-2); align-items: center; flex-shrink: 0; }
+  }
+
+  &__meta {
+    @include flex-row($space-2);
+    align-items: center;
+    overflow: hidden;
+  }
+
+  &__nombre {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+    @include truncate;
+    max-width: 320px;
+  }
+
+  &__version-tag {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-text-muted;
+    background: $color-secondary-100;
+    padding: 2px 8px;
+    border-radius: $border-radius-full;
+    white-space: nowrap;
+  }
+
+  // ── Presencia colaborativa ────────────────────────────────────────────────
+
+  &__presencia {
+    @include flex-row(-6px); // avatares superpuestos
+    align-items: center;
+  }
+
+  &__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid $color-bg-card;
+    color: #fff;
+    font-size: 12px;
+    font-weight: $font-weight-semibold;
+    cursor: default;
+    user-select: none;
+    transition: transform 0.15s ease;
+
+    &:hover { transform: scale(1.15); z-index: 1; }
+  }
+
+  &__readonly {
+    @include flex-row($space-1);
+    align-items: center;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-text-muted;
+    padding: $space-1 $space-3;
+    background: $color-secondary-100;
+    border-radius: $border-radius-full;
+    i { font-size: 11px; }
+  }
+
+  // ── Cuerpo ────────────────────────────────────────────────────────────────
+
+  &__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  // ── Área de canvas ────────────────────────────────────────────────────────
+
+  &__canvas-area {
+    flex: 1;
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+
+    app-toolbar-diagrama {
+      position: absolute;
+      bottom: $space-4;
+      left: 50%;
+      right: auto;
+      top: auto;
+      transform: translateX(-50%);
+      z-index: $z-sticky;
+    }
+
+    app-canvas {
+      flex: 1;
+      display: flex;
+      min-width: 0;
+    }
+  }
+
+  &__loading {
+    @include flex-col($space-3);
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+  }
+
+  // ── Panel de validación ───────────────────────────────────────────────────
+
+  &__validation {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 340px;
+    max-height: 440px;
+    overflow-y: auto;
+    background: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
+    z-index: 50;  // > toolbar ($z-sticky: 30) y > paleta flotante
+  }
+
+  &__validation-header {
+    @include flex-between;
+    align-items: center;
+    padding: $space-3 $space-3 $space-2;
+    border-bottom: 1px solid $color-border;
+    position: sticky;
+    top: 0;
+    background: $color-bg-card;
+  }
+
+  &__validation-title {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  &__validation-section {
+    padding: $space-2 $space-3;
+  }
+
+  &__val-label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 $space-1;
+
+    &--error { color: $color-danger; }
+    &--warn  { color: #d97706; }
+  }
+
+  &__val-item {
+    @include flex-col($space-1);
+    padding: $space-2;
+    border-radius: $border-radius-md;
+    margin-bottom: $space-1;
+    font-size: $font-size-sm;
+
+    &--error { background: rgba(239, 68, 68, 0.06); color: #991b1b; }
+    &--warn  { background: rgba(245, 158, 11, 0.06); color: #92400e; }
+  }
+
+  &__val-code {
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+    font-size: 10px;
+    font-weight: $font-weight-semibold;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 1px 5px;
+    border-radius: 4px;
+    align-self: flex-start;
+  }
+
+  &__val-ok {
+    padding: $space-3;
+    font-size: $font-size-sm;
+    color: #166534;
+    background: rgba(34, 197, 94, 0.06);
+    margin: $space-2;
+    border-radius: $border-radius-md;
+    text-align: center;
+  }
+}
+
+// ── Dialog de configuración de nodo ──────────────────────────────────────────
+
+::ng-deep .sp1-dialog--nodo {
+  .p-dialog-content {
+    padding: 0;
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+  }
+
+  app-panel-nodo .panel-nodo {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    max-height: 80vh;
+    border-left: none;
+  }
+}
+
+// ── Área de micrófono (bottom-left del canvas) ───────────────────────────────
+
+.editor__mic-area {
+  position: absolute;
+  bottom: $space-4;
+  left: $space-4;
+  z-index: $z-sticky;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-2;
+}
+
+// ── Botón micrófono ───────────────────────────────────────────────────────────
+
+.mic-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+  cursor: pointer;
+  color: $color-text-secondary;
+  font-family: $font-family-base;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+  overflow: hidden;
+
+  svg { color: $color-secondary-400; transition: color $transition-fast; }
+
+  &:hover {
+    background: #fff;
+    border-color: $color-border-strong;
+    box-shadow: $shadow-lg;
+    color: $color-text-primary;
+    svg { color: $color-primary-500; }
+  }
+
+  &--active {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+    svg { color: $color-danger; }
+
+    &:hover {
+      background: #fee2e2;
+      border-color: $color-danger;
+    }
+  }
+
+  &--unsupported {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &__label {
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  // Pulso rojo animado cuando está grabando
+  &__pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(220, 38, 38, 0.08);
+    animation: mic-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes mic-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.03); }
+}
+
+// ── Panel de transcripción ────────────────────────────────────────────────────
+
+.mic-panel {
+  @include card-compact;
+  width: 280px;
+  @include flex-col($space-2);
+  box-shadow: $shadow-lg;
+
+  &__header {
+    @include flex-between;
+    align-items: center;
+  }
+
+  &__label {
+    @include flex-row($space-2);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    .pi-microphone { color: $color-danger; }
+    .pi-check-circle { color: $color-success; }
+  }
+
+  &__close {
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    border-radius: $border-radius-md;
+    @include flex-center;
+    color: $color-text-muted;
+    cursor: pointer;
+    padding: 0;
+    transition: background $transition-fast, color $transition-fast;
+    font-size: 10px;
+
+    &:hover { background: $color-secondary-100; color: $color-text-primary; }
+  }
+
+  &__text {
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+    line-height: $line-height-normal;
+    margin: 0;
+    min-height: 40px;
+    padding: $space-2;
+    background: $color-secondary-50;
+    border-radius: $border-radius-md;
+    border: 1px solid $color-border;
+    word-break: break-word;
+  }
+
+  &__actions {
+    @include flex-row($space-2);
+    justify-content: flex-end;
+  }
+}
+
+// ── Dialog Asistente IA ───────────────────────────────────────────────────────
+
+.ia-dialog {
+  @include flex-col($space-4);
+
+  &__intro {
+    @include flex-row($space-3);
+    align-items: flex-start;
+    padding: $space-3;
+    background: #f5f3ff;
+    border: 1px solid #ddd6fe;
+    border-radius: $border-radius-md;
+  }
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    background: #7c3aed;
+    border-radius: $border-radius-md;
+    @include flex-center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  &__desc {
+    font-size: $font-size-sm;
+    color: #4c1d95;
+    line-height: $line-height-normal;
+    margin: 0;
+  }
+
+  &__form {
+    @include flex-col($space-3);
+  }
+
+  &__warning {
+    @include flex-row($space-2);
+    align-items: flex-start;
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    margin: 0;
+    line-height: $line-height-normal;
+
+    i { color: $color-warning; flex-shrink: 0; margin-top: 1px; }
+  }
+}
+
+// ── Helpers de formulario compartidos ────────────────────────────────────────
+
+.panel-field {
+  @include flex-col($space-1);
+}
+
+.form-error {
+  color: $color-danger;
+  font-size: $font-size-xs;
+}
+
+.form-hint {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+}
+
+// ── Dialogs ───────────────────────────────────────────────────────────────────
+
+.conn-dialog {
+  @include flex-col($space-3);
+
+  &__route {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+    padding: $space-2 $space-3;
+    background: $color-secondary-50;
+    border-radius: $border-radius-md;
+  }
+}
+
+.calle-form {
+  @include flex-col($space-3);
+}

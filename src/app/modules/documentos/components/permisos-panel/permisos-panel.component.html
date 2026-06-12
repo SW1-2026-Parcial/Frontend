@@ -1,0 +1,54 @@
+<p-toast />
+
+<div class="permisos-container">
+  <p class="text-color-secondary mb-3">
+    Asigna permisos a usuarios específicos para este documento.
+  </p>
+
+  <div class="permisos-list">
+    <div *ngFor="let permiso of permisos; let i = index" class="permiso-row">
+      <p-select
+        [(ngModel)]="permiso.userId"
+        [options]="usuarios"
+        optionLabel="nombre"
+        optionValue="id"
+        placeholder="Seleccionar usuario"
+        appendTo="body"
+        [filter]="true"
+        filterPlaceholder="Buscar usuario…"
+        [style]="{ width: '100%' }"
+      />
+      <p-select
+        [(ngModel)]="permiso.nivel"
+        [options]="niveles"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [style]="{ width: '10rem' }"
+      />
+      <p-button
+        icon="pi pi-times"
+        [rounded]="true"
+        [text]="true"
+        severity="danger"
+        (onClick)="quitarPermiso(i)"
+      />
+    </div>
+  </div>
+
+  <div class="permisos-actions mt-3">
+    <p-button
+      label="Agregar permiso"
+      icon="pi pi-plus"
+      [text]="true"
+      severity="info"
+      (onClick)="agregarPermiso()"
+    />
+    <p-button
+      label="Guardar"
+      icon="pi pi-check"
+      [loading]="saving"
+      (onClick)="guardar()"
+    />
+  </div>
+</div>

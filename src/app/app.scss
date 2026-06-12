@@ -1,0 +1,42 @@
+@use 'abstracts' as *;
+
+// El sidebar es position:fixed — no es un flex child útil.
+// app-shell es display:block; app-shell__main hace el margin-left.
+.app-shell {
+  display: block;
+  height: 100dvh;
+  overflow: hidden;
+
+  &__main {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: $color-bg-page;
+    margin-left: $sidebar-width;
+    transition: margin-left $transition-base;
+
+    &.sidebar-collapsed {
+      margin-left: $sidebar-collapsed;
+    }
+  }
+}
+
+// Contenedor del router-outlet — llena el espacio bajo el header fijo
+.page-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding-top: $header-height;
+
+  // Custom elements (<app-xxx>) son display:inline por defecto en browser.
+  // Como flex children en column, NO se estiran al ancho completo sin este fix.
+  > * {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}

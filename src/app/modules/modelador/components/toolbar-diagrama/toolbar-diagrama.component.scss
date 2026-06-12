@@ -1,0 +1,191 @@
+@use 'abstracts' as *;
+
+:host {
+  position: absolute;
+  bottom: $space-4;
+  left: 50%;
+  right: auto;
+  top: auto;
+  transform: translateX(-50%);
+  z-index: $z-sticky;
+  pointer-events: none;
+}
+
+// ── Paleta horizontal ─────────────────────────────────────────────────────────
+
+.palette {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: $space-1;
+  width: auto;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  padding: $space-2 $space-3;
+}
+
+// ── Título de sección — oculto en modo horizontal ─────────────────────────────
+
+.palette__title {
+  display: none;
+}
+
+// ── Items arrastrables (fila horizontal) ──────────────────────────────────────
+
+.palette__items {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.palette__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: $space-2 $space-2;
+  border-radius: $border-radius-md;
+  cursor: grab;
+  border: 1px solid transparent;
+  transition: background $transition-fast, border-color $transition-fast, transform 0.1s;
+
+  &:hover {
+    background: $color-secondary-50;
+    border-color: $color-border;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    cursor: grabbing;
+    background: $color-secondary-100;
+    transform: scale(0.96);
+  }
+}
+
+// ── Preview SVG miniatura ──────────────────────────────────────────────────────
+
+.palette__preview {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.prev-start    { fill: #1e293b; }
+.prev-end-outer { fill: none; stroke: #1e293b; stroke-width: 3.5; }
+.prev-end-inner { fill: #1e293b; }
+.prev-activity  { fill: #fff; stroke: #1e293b; stroke-width: 2.5; }
+.prev-decision  { fill: #fff; stroke: #1e293b; stroke-width: 2.5; }
+.prev-merge     { fill: rgba(255,255,255,0.5); stroke: #1e293b; stroke-width: 2; stroke-dasharray: 4 2; }
+.prev-forkjoin  { fill: #1e293b; }
+.prev-forkline  { stroke: #94a3b8; stroke-width: 2; stroke-linecap: round; fill: none; }
+
+// ── Label del item ────────────────────────────────────────────────────────────
+
+.palette__item-label {
+  font-family: $font-family-base;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+// ── Grip indicator — oculto en modo horizontal ────────────────────────────────
+
+.palette__grip {
+  display: none;
+}
+
+// ── Separador vertical ────────────────────────────────────────────────────────
+
+.palette__sep {
+  width: 1px;
+  align-self: stretch;
+  background: $color-border;
+  margin: 0 $space-1;
+  flex-shrink: 0;
+}
+
+// ── Herramientas (fila horizontal) ────────────────────────────────────────────
+
+.palette__tools {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.palette__tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: $space-2 $space-2;
+  border-radius: $border-radius-md;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-family: $font-family-base;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  transition: background $transition-fast, border-color $transition-fast;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+    color: $color-secondary-400;
+    transition: color $transition-fast;
+  }
+
+  &:hover {
+    background: $color-secondary-50;
+    border-color: $color-border;
+    svg { color: $color-primary-500; }
+  }
+
+  &--active {
+    background: $color-primary-50;
+    border-color: $color-primary-200;
+    color: $color-primary-700;
+    svg { color: $color-primary-500; }
+  }
+
+  &--danger {
+    &:hover { background: #fef2f2; border-color: #fecaca; svg { color: $color-danger; } }
+    &.palette__tool--active {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+      svg { color: $color-danger; }
+    }
+  }
+
+  &--ia {
+    color: #6d28d9;
+    svg { color: #7c3aed; }
+
+    &:hover {
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      svg { color: #7c3aed; }
+    }
+  }
+}
+
+// ── Separador pequeño (entre grupos dentro de tools) ──────────────────────────
+
+.palette__sep--sm {
+  width: 1px;
+  align-self: stretch;
+  background: $color-border;
+  margin: 0 2px;
+  flex-shrink: 0;
+}

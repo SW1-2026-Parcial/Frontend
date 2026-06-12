@@ -1,0 +1,4 @@
+// _functions.scss — Utilidades SCSS
+@function rem($px) { @return #{$px / 16}rem; }
+@function em($px, $base: 16) { @return #{$px / $base}em; }
+@function alpha($color, $opacity) { @return rgba($color, $opacity); }

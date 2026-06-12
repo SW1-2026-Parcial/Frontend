@@ -1,0 +1,242 @@
+<div class="mira-error" *ngIf="!loading && errorCarga">
+  <i class="pi pi-exclamation-triangle"></i>
+  <p>No se pudo conectar con el análisis inteligente. Verificá que el backend esté activo.</p>
+  <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargarDatos()" severity="secondary" [outlined]="true" size="small" />
+</div>
+
+<div class="mira-container" *ngIf="!loading && !errorCarga; else loadingTpl">
+
+  <!-- Encabezado explicativo -->
+  <div class="mira-header">
+    <div class="mira-title">
+      <i class="pi pi-bolt"></i>
+      <div>
+        <h2>Análisis Inteligente de Trámites</h2>
+        <p>
+          Analiza en tiempo real todos los trámites activos y detecta automáticamente
+          <strong>cuáles están en riesgo de demorarse</strong>, <strong>qué anomalías hay</strong> y
+          <strong>qué tareas atender primero</strong>. Funciona con heurísticas sobre los datos
+          reales del sistema — no requiere configuración.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards resumen -->
+  <div class="mira-cards">
+
+    <div class="mira-card score-card" [style.border-left-color]="scoreColor">
+      <div class="card-header">
+        <i class="pi pi-shield mr-1"></i>Riesgo Global
+      </div>
+      <div class="card-value" [style.color]="scoreColor">
+        {{ (dashboard?.scoreRiesgoGlobal ?? 0) * 100 | number:'1.0-0' }}%
+      </div>
+      <div class="card-label">{{ scoreLabel }}</div>
+      <div class="card-desc">
+        % de trámites activos con alta probabilidad de retrasarse respecto al tiempo histórico
+      </div>
+    </div>
+
+    <div class="mira-card">
+      <div class="card-header">
+        <i class="pi pi-bolt mr-1 text-orange-500"></i>Anomalías
+      </div>
+      <div class="card-value text-orange-500">{{ dashboard?.totalAnomalias || 0 }}</div>
+      <div class="card-label">situaciones irregulares</div>
+      <div class="card-desc">
+        Tareas sin asignar más de 2h, trámites paralizados, nodos con tiempo 3× el promedio
+      </div>
+    </div>
+
+    <div class="mira-card">
+      <div class="card-header">
+        <i class="pi pi-list-check mr-1 text-blue-500"></i>Tareas Pendientes
+      </div>
+      <div class="card-value text-blue-500">{{ dashboard?.totalTareasPendientes || 0 }}</div>
+      <div class="card-label">en cola</div>
+      <div class="card-desc">
+        Ver tab "Priorización" para saber cuáles atender primero según urgencia calculada
+      </div>
+    </div>
+
+    <div class="mira-card">
+      <div class="card-header">
+        <i class="pi pi-exclamation-circle mr-1 text-red-500"></i>Alertas Críticas
+      </div>
+      <div class="card-value text-red-500">{{ dashboard?.alertas?.length || 0 }}</div>
+      <div class="card-label">requieren acción inmediata</div>
+      <div class="card-desc">
+        Trámites con gravedad ERROR: superaron el tiempo máximo o entraron en estado inválido
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Alertas críticas expandibles -->
+  <div class="mira-alertas" *ngIf="dashboard?.alertas?.length">
+    <div class="alertas-header">
+      <i class="pi pi-exclamation-triangle mr-2 text-red-500"></i>
+      <strong>Trámites que requieren atención inmediata</strong>
+    </div>
+    <div class="alerta-item" *ngFor="let a of dashboard!.alertas">
+      <span class="alerta-ticket">{{ a.ticketNumber || a.tramiteId.slice(0,8) }}</span>
+      <span class="alerta-tipo">{{ a.tipo }}</span>
+      <span class="alerta-desc">{{ a.descripcion }}</span>
+    </div>
+  </div>
+
+  <!-- Distribución de riesgos -->
+  <div class="mira-section" *ngIf="dashboard">
+    <h3>
+      <i class="pi pi-chart-pie mr-2"></i>Distribución de riesgos entre trámites activos
+    </h3>
+    <p class="section-desc">
+      El sistema calcula la probabilidad de demora de cada trámite activo comparando
+      su tiempo actual vs. el tiempo histórico promedio para ese tipo de proceso.
+    </p>
+    <div class="risk-bars">
+      <div class="risk-bar-item" *ngFor="let entry of [
+        {label: 'Bajo (en tiempo)',        value: dashboard.resumenRiesgos.BAJO,    color: '#4caf50'},
+        {label: 'Medio (empieza a tardar)',value: dashboard.resumenRiesgos.MEDIO,   color: '#ff9800'},
+        {label: 'Alto (retrasado)',         value: dashboard.resumenRiesgos.ALTO,    color: '#f57c00'},
+        {label: 'Crítico (muy retrasado)', value: dashboard.resumenRiesgos.CRITICO, color: '#f44336'}
+      ]">
+        <span class="risk-label">{{ entry.label }}</span>
+        <div class="risk-bar">
+          <div class="risk-fill" [style.width.%]="totalTramites ? (entry.value / totalTramites * 100) : 0" [style.background]="entry.color"></div>
+        </div>
+        <span class="risk-count">{{ entry.value }} trámites</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs de detalle -->
+  <div class="mira-tabs">
+    <div class="tab-header">
+      <button [class.active]="activeTab === 0" (click)="activeTab = 0">
+        <i class="pi pi-exclamation-triangle mr-1"></i>
+        Riesgos de demora <span class="tab-badge">{{ riesgos.length }}</span>
+      </button>
+      <button [class.active]="activeTab === 1" (click)="activeTab = 1">
+        <i class="pi pi-bolt mr-1"></i>
+        Anomalías detectadas <span class="tab-badge">{{ anomalias.length }}</span>
+      </button>
+      <button [class.active]="activeTab === 2" (click)="activeTab = 2">
+        <i class="pi pi-sort-amount-up mr-1"></i>
+        ¿Qué tarea hacer primero? <span class="tab-badge">{{ tareasPriorizadas.length }}</span>
+      </button>
+    </div>
+
+    <!-- Descripción del tab activo -->
+    <div class="tab-description">
+      <ng-container [ngSwitch]="activeTab">
+        <span *ngSwitchCase="0">
+          Trámites activos ordenados por probabilidad de no cumplir el tiempo esperado.
+          Los <strong>Críticos</strong> llevan más de 24h sin avanzar.
+        </span>
+        <span *ngSwitchCase="1">
+          Situaciones que el sistema detectó como fuera de lo normal:
+          tareas bloqueadas, nodos sin actividad, patrones estadísticamente atípicos.
+        </span>
+        <span *ngSwitchCase="2">
+          Lista de tareas pendientes ordenadas por urgencia calculada automáticamente.
+          El <strong>#1</strong> es la tarea más crítica a atender ahora mismo.
+        </span>
+      </ng-container>
+    </div>
+
+    <!-- Tab Riesgos -->
+    <div class="tab-content" *ngIf="activeTab === 0">
+      <p-table [value]="riesgos" [paginator]="true" [rows]="8" styleClass="p-datatable-sm p-datatable-striped"
+               emptyMessage="No hay trámites en riesgo. Todo en tiempo normal.">
+        <ng-template #header>
+          <tr>
+            <th>Ticket</th>
+            <th>Nivel de riesgo</th>
+            <th>Prob. de demora</th>
+            <th>Tiempo activo</th>
+            <th>¿Por qué está en riesgo?</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-item>
+          <tr>
+            <td class="font-semibold">{{ item.ticketNumber || item.tramiteId.slice(0,8) }}</td>
+            <td><p-tag [value]="item.nivelRiesgo" [severity]="severityRiesgo(item.nivelRiesgo)" /></td>
+            <td>{{ item.probabilidadDemora * 100 | number:'1.0-0' }}%</td>
+            <td>{{ item.horasTranscurridas | number:'1.1-1' }}h</td>
+            <td><span class="text-sm">{{ item.factores.join(' · ') }}</span></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Tab Anomalías -->
+    <div class="tab-content" *ngIf="activeTab === 1">
+      <p-table [value]="anomalias" [paginator]="true" [rows]="8" styleClass="p-datatable-sm p-datatable-striped"
+               emptyMessage="No se detectaron anomalías. El sistema opera con normalidad.">
+        <ng-template #header>
+          <tr>
+            <th>Ticket</th>
+            <th>Tipo de anomalía</th>
+            <th>Gravedad</th>
+            <th>Qué pasó</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-item>
+          <tr>
+            <td>{{ item.ticketNumber || '—' }}</td>
+            <td><p-tag [value]="item.tipo" severity="info" /></td>
+            <td><p-tag [value]="item.gravedad" [severity]="severityAnomalia(item.gravedad)" /></td>
+            <td class="text-sm">{{ item.descripcion }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Tab Priorización -->
+    <div class="tab-content" *ngIf="activeTab === 2">
+      <p-table [value]="tareasPriorizadas" [paginator]="true" [rows]="8" styleClass="p-datatable-sm p-datatable-striped"
+               emptyMessage="No hay tareas pendientes actualmente.">
+        <ng-template #header>
+          <tr>
+            <th pTooltip="Orden de atención recomendado por el sistema">Prioridad</th>
+            <th>Ticket</th>
+            <th>Paso del proceso</th>
+            <th pTooltip="Score 0-100: mayor = más urgente">Urgencia</th>
+            <th>Asignada</th>
+            <th>Motivo de urgencia</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-item>
+          <tr>
+            <td>
+              <span class="prioridad-badge" [class.top3]="item.prioridadMIRA <= 3">
+                #{{ item.prioridadMIRA }}
+              </span>
+            </td>
+            <td>{{ item.ticketNumber || item.tramiteId.slice(0,8) }}</td>
+            <td>{{ item.etiquetaNodo }}</td>
+            <td>
+              <p-progressBar [value]="item.scoreUrgencia * 100" [showValue]="false" [style]="{ height: '6px', width: '80px' }" />
+              <span class="text-xs ml-1">{{ item.scoreUrgencia * 100 | number:'1.0-0' }}</span>
+            </td>
+            <td>
+              <p-tag *ngIf="item.assignedTo" value="Sí" severity="success" />
+              <p-tag *ngIf="!item.assignedTo" value="Sin asignar" severity="warn" />
+            </td>
+            <td class="text-sm">{{ item.factores.join(' · ') }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #loadingTpl>
+  <div class="flex flex-column align-items-center justify-content-center gap-3" style="height: 400px">
+    <p-progressBar mode="indeterminate" [style]="{ height: '4px', width: '200px' }" />
+    <small style="color: var(--text-color-secondary)">Analizando trámites activos…</small>
+  </div>
+</ng-template>

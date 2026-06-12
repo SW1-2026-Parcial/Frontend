@@ -1,0 +1,42 @@
+// BASE · _typography.scss — Plus Jakarta Sans + utilidades tipográficas
+@use 'abstracts/variables' as *;
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+// Solo clases usadas en templates
+.text-xs       { font-size: $font-size-xs; }
+.text-sm       { font-size: $font-size-sm; }
+.text-3xl      { font-size: $font-size-3xl; }
+
+.font-medium   { font-weight: $font-weight-medium; }
+.font-semibold { font-weight: $font-weight-semibold; }
+
+.text-primary  { color: $color-text-primary; }
+.text-danger   { color: $color-danger; }
+
+.page-title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+}
+
+.page-subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: $space-1;
+}
+
+.section-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.label-field {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: $space-1;
+}

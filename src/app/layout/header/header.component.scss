@@ -1,0 +1,20 @@
+@use 'abstracts' as *;
+
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  .sp1-user-menu {
+    min-width: 180px;
+    border-radius: $border-radius-lg !important;
+    box-shadow: $shadow-lg !important;
+    border: 1px solid $color-border !important;
+    overflow: hidden;
+
+    .p-menuitem-link {
+      padding: $space-3 $space-4 !important;
+      font-size: $font-size-sm !important;
+    }
+  }
+}

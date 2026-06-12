@@ -1,0 +1,69 @@
+.detalle-container {
+  padding: 0.5rem;
+}
+
+.detalle-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--p-surface-200);
+  margin-bottom: 1rem;
+
+  &__info {
+    flex: 1;
+  }
+}
+
+.detalle-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detalle-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--p-surface-100);
+}
+
+.detalle-info-label {
+  font-size: 0.85rem;
+  color: var(--p-text-secondary-color);
+  font-weight: 500;
+}
+
+.detalle-info-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.detalle-historial {
+  padding: 0.5rem 0;
+}
+
+.historial-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.historial-actor {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.permisos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.permiso-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

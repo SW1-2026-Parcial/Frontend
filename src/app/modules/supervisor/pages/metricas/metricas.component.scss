@@ -1,0 +1,107 @@
+@use 'abstracts' as *;
+
+.metricas {
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin: 0 0 $space-1;
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__section-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__filtros-section {
+    margin-bottom: $space-6;
+  }
+
+  &__filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: $space-4;
+  }
+
+  &__filtro-group {
+    @include flex-col($space-2);
+    min-width: 180px;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-secondary;
+  }
+
+  &__select {
+    min-width: 200px;
+  }
+
+  &__date-input {
+    @include input-base;
+    height: 40px;
+    min-width: 160px;
+  }
+
+  &__btn-consultar {
+    align-self: flex-end;
+  }
+
+  &__error {
+    @include flex-row($space-2);
+    padding: $space-4;
+    background: $color-danger-light;
+    border: 1px solid $color-danger;
+    border-radius: $border-radius-md;
+    color: $color-danger;
+    font-size: $font-size-sm;
+    margin-bottom: $space-6;
+
+    i { font-size: $font-size-lg; flex-shrink: 0; }
+  }
+
+  &__chart-container {
+    height: 300px;
+    position: relative;
+  }
+
+  &__chart-hint {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    font-style: italic;
+  }
+
+  &__nodo-label {
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+  }
+
+  &__tiempo {
+    font-family: ui-monospace, monospace;
+    color: $color-primary-600;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__ejecuciones {
+    color: $color-text-secondary;
+    text-align: center;
+  }
+
+  &__empty {
+    text-align: center;
+    color: $color-text-muted;
+    padding: $space-6;
+    font-size: $font-size-sm;
+  }
+}
+

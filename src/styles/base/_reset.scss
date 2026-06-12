@@ -1,0 +1,73 @@
+// _reset.scss — Normalizacion entre navegadores
+@use 'abstracts/variables' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+  background-color: $color-bg-page;
+  min-height: 100dvh;
+}
+
+a {
+  color: $color-primary-500;
+  text-decoration: none;
+
+  &:hover {
+    color: $color-primary-600;
+    text-decoration: underline;
+  }
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+  color: $color-text-primary;
+}
+
+p {
+  line-height: $line-height-normal;
+}
+
+// Layout offset ahora en app.scss → .app-shell__main (margin-left)
+// y .page-content (padding-top). No duplicar aquí.

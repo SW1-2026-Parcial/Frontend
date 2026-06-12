@@ -1,0 +1,281 @@
+@use 'abstracts' as *;
+
+.ejecutar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  &__topbar {
+    @include flex-row($space-3);
+    align-items: center;
+    padding: $space-2 $space-4;
+    background: $color-bg-card;
+    border-bottom: 1px solid $color-border;
+    flex-shrink: 0;
+  }
+
+  &__breadcrumb {
+    @include flex-row($space-1);
+    align-items: center;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+
+  &__breadcrumb-item {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+
+    &--link {
+      cursor: pointer;
+      color: $color-primary-600;
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  &__breadcrumb-sep {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    padding: 0 2px;
+  }
+
+  &__breadcrumb-current {
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  &__ticket {
+    font-family: ui-monospace, monospace;
+    font-weight: $font-weight-semibold;
+    color: $color-primary-600;
+  }
+
+  &__badges {
+    @include flex-row($space-2);
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &__main {
+    flex: 1;
+    overflow-y: auto;
+    padding: $space-5 $space-6;
+    @include flex-col($space-5);
+    @include custom-scrollbar;
+  }
+
+  &__context {
+    @include flex-row($space-4);
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+
+  &__context-row {
+    @include flex-row($space-1);
+    align-items: center;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    i { font-size: 12px; }
+  }
+
+  &__instruccion {
+    @include flex-row($space-3);
+    align-items: flex-start;
+    border-radius: $border-radius-lg;
+    padding: $space-3 $space-4;
+
+    strong { font-weight: $font-weight-semibold; font-size: $font-size-sm; display: block; margin-bottom: $space-1; }
+    p { font-size: $font-size-sm; margin: 0; line-height: $line-height-normal; }
+
+    &--avance {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      strong, p { color: #1e3a8a; }
+    }
+
+    &--rechazo {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      strong, p { color: #7c2d12; }
+    }
+  }
+
+  &__instruccion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+
+    .ejecutar__instruccion--avance & { color: #3b82f6; }
+    .ejecutar__instruccion--rechazo & { color: #f97316; }
+  }
+
+  &__section-title {
+    @include flex-row($space-2);
+    align-items: center;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 $space-3;
+  }
+
+  &__form-block {
+    @include flex-col($space-1);
+  }
+
+  &__sin-formulario {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    font-style: italic;
+    margin: 0;
+    padding: $space-3 0;
+  }
+
+  &__rama-block {
+    @include flex-col($space-2);
+  }
+
+  &__rama-desc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0 0 $space-2;
+  }
+
+  &__error {
+    color: $color-danger;
+    font-size: $font-size-xs;
+    display: block;
+  }
+
+  &__aside {
+    width: 300px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-left: 1px solid $color-border;
+    background: $color-bg-card;
+    padding: $space-5 $space-4;
+    @include flex-col($space-4);
+    @include custom-scrollbar;
+  }
+
+  &__actions {
+    @include flex-col($space-2);
+  }
+
+  &__loading {
+    @include flex-col($space-3);
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+  }
+}
+
+// ── Dialog de rechazo ─────────────────────────────────────────────────────────
+
+.rechazo-dialog {
+  @include flex-col($space-3);
+  padding-bottom: $space-2;
+
+  &__desc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
+    line-height: $line-height-normal;
+  }
+
+  &__warn {
+    @include flex-row($space-2);
+    align-items: flex-start;
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: $border-radius-md;
+    padding: $space-3;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: $line-height-normal;
+    margin: 0;
+  }
+
+  &__guia {
+    @include flex-row($space-2);
+    align-items: flex-start;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: $border-radius-md;
+    padding: $space-2 $space-3;
+    font-size: $font-size-xs;
+    color: #7c2d12;
+    i { flex-shrink: 0; font-size: 12px; margin-top: 1px; color: #f97316; }
+  }
+
+  &__footer {
+    @include flex-row($space-2);
+    justify-content: flex-end;
+  }
+}
+
+// ── Shared dentro del componente ──────────────────────────────────────────────
+
+.panel-field {
+  @include flex-col($space-1);
+}
+
+.label-field {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.form-error {
+  color: $color-danger;
+  font-size: $font-size-xs;
+  min-height: 16px;
+  display: block;
+}
+
+.text-danger { color: $color-danger; }
+
+// ── Sidebar mini-diagrama ─────────────────────────────────────────────────────
+
+.diagrama-sidebar {
+  position: fixed;
+  right: 0;
+  top: 80px;
+  width: 300px;
+  background: white;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  padding: 12px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+
+  &--collapsed {
+    width: 36px;
+    padding: 8px 4px;
+    overflow: hidden;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 12px;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 0;
+  }
+}

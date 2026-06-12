@@ -1,0 +1,180 @@
+@use 'abstracts' as *;
+
+.panel-nodo {
+  width: 320px;
+  min-width: 320px;
+  height: 100%;
+  background: $color-bg-card;
+  border-left: 1px solid $color-border;
+  @include flex-col(0);
+  overflow-y: auto;
+  @include custom-scrollbar;
+  flex-shrink: 0;
+
+  &__empty {
+    @include flex-col($space-3);
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: $space-8;
+    text-align: center;
+
+    &-icon {
+      width: 56px;
+      height: 56px;
+      background: $color-secondary-100;
+      border-radius: $border-radius-xl;
+      @include flex-center;
+      i { font-size: 24px; color: $color-secondary-400; }
+    }
+
+    &-text {
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__header {
+    @include flex-between;
+    padding: $space-4;
+    border-bottom: 1px solid $color-border;
+    position: sticky;
+    top: 0;
+    background: $color-bg-card;
+    z-index: $z-raised;
+
+    &-info {
+      @include flex-col($space-1);
+      flex: 1;
+      overflow: hidden;
+    }
+  }
+
+  &__title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    @include truncate;
+    margin: 0;
+  }
+
+  &__close {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    border-radius: $border-radius-md;
+    @include flex-center;
+    color: $color-text-muted;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color $transition-fast, color $transition-fast;
+    padding: 0;
+
+    &:hover { background: $color-secondary-100; color: $color-text-primary; }
+  }
+
+  &__tipo-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: $border-radius-full;
+    background: $color-secondary-100;
+    color: $color-text-secondary;
+    align-self: flex-start;
+
+    &--activity  { background: #eff6ff; color: #1d4ed8; }
+    &--decision  { background: #fef9c3; color: #854d0e; }
+    &--fork,
+    &--join      { background: #f0fdf4; color: #166534; }
+    &--merge     { background: #faf5ff; color: #6d28d9; }
+    &--start,
+    &--end       { background: $color-secondary-900; color: #fff; }
+  }
+
+  &__form {
+    padding: $space-4;
+    @include flex-col($space-3);
+  }
+}
+
+.panel-field {
+  @include flex-col($space-1);
+
+  &--half { flex: 1; }
+
+  &--inline {
+    @include flex-row($space-2);
+    align-items: center;
+  }
+}
+
+.panel-campo {
+  @include flex-col($space-2);
+  padding: $space-3;
+  background: $color-secondary-50;
+  border-radius: $border-radius-md;
+  border: 1px solid $color-border;
+
+  &__header {
+    @include flex-between;
+  }
+
+  &__index {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__row {
+    @include flex-row($space-2);
+    align-items: flex-start;
+  }
+}
+
+.panel-campos {
+  @include flex-col($space-3);
+}
+
+.panel-sep {
+  height: 1px;
+  background: $color-border;
+  margin: $space-1 0;
+}
+
+.panel-section-title {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.panel-campo__idx {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.panel-campo__del {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  border-radius: $border-radius-md;
+  @include flex-center;
+  cursor: pointer;
+  color: $color-text-muted;
+  padding: 0;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover { background: rgba(239, 68, 68, 0.08); color: $color-danger; }
+}

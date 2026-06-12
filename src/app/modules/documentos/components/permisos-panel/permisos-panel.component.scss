@@ -1,0 +1,21 @@
+.permisos-container {
+  padding: 0.5rem 0;
+}
+
+.permisos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.permiso-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.permisos-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

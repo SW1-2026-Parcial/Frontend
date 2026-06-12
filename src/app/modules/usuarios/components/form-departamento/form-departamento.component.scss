@@ -1,0 +1,27 @@
+@use 'abstracts' as *;
+
+.form-depto { @include flex-col($space-4); }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-4;
+}
+
+.form-field {
+  @include flex-col($space-1);
+  &--full { grid-column: 1 / -1; }
+  input, textarea { width: 100%; }
+}
+
+.form-error {
+  color: $color-danger;
+  font-size: $font-size-xs;
+}
+
+.form-footer {
+  @include flex-row($space-3);
+  justify-content: flex-end;
+  padding-top: $space-4;
+  border-top: 1px solid $color-border;
+}

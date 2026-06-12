@@ -1,0 +1,108 @@
+// _mixins.scss — Fragmentos CSS reutilizables
+@use 'variables' as *;
+
+// Card
+@mixin card {
+  background: $color-bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  border: 1px solid $color-border;
+  padding: $space-6;
+}
+
+@mixin card-compact {
+  background: $color-bg-card;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-xs;
+  border: 1px solid $color-border;
+  padding: $space-4;
+}
+
+// Flex
+@mixin flex-row($gap: $space-4) { display: flex; align-items: center; gap: $gap; }
+@mixin flex-col($gap: $space-4) { display: flex; flex-direction: column; gap: $gap; }
+@mixin flex-center { display: flex; align-items: center; justify-content: center; }
+@mixin flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+// Status badge
+@mixin status-badge($bg, $color) {
+  background-color: $bg;
+  color: $color;
+  padding: $space-1 $space-3;
+  border-radius: $border-radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+// Scrollbar
+@mixin custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: $color-secondary-300 transparent;
+  &::-webkit-scrollbar { width: 6px; height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: $color-secondary-300;
+    border-radius: $border-radius-full;
+    &:hover { background: $color-secondary-400; }
+  }
+}
+
+// Responsive
+@mixin respond-to($bp) {
+  @if $bp == 'sm'  { @media (min-width: #{$bp-sm})  { @content; } }
+  @else if $bp == 'md'  { @media (min-width: #{$bp-md})  { @content; } }
+  @else if $bp == 'lg'  { @media (min-width: #{$bp-lg})  { @content; } }
+  @else if $bp == 'xl'  { @media (min-width: #{$bp-xl})  { @content; } }
+  @else if $bp == '2xl' { @media (min-width: #{$bp-2xl}) { @content; } }
+}
+
+// Input
+@mixin input-base {
+  width: 100%;
+  height: 40px;
+  padding: $space-2 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  font-family: $font-family-base;
+  color: $color-text-primary;
+  background: $color-bg-card;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  outline: none;
+  &:focus { border-color: $color-primary-500; box-shadow: 0 0 0 3px rgba($color-primary-500, 0.1); }
+  &::placeholder { color: $color-text-muted; }
+  &:disabled { background: $color-secondary-50; color: $color-text-muted; cursor: not-allowed; }
+}
+
+// Button
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  font-family: $font-family-base;
+  cursor: pointer;
+  border: none;
+  transition: all $transition-fast;
+  white-space: nowrap;
+  text-decoration: none;
+  &:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+}
+
+@mixin truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@mixin visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+@mixin focus-ring($color: $color-primary-500) { outline: 2px solid $color; outline-offset: 2px; }

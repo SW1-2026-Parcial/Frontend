@@ -1,0 +1,262 @@
+<div
+  class="wrap"
+  #wrap
+  (dragover)="onDragOver($event)"
+  (drop)="onDrop($event)"
+  (mousemove)="onCanvasMouseMove($event)"
+  (mouseup)="onCanvasMouseUp()"
+  (mouseleave)="onCanvasMouseUp()"
+  [class.wrap--conectar]="modoConectar"
+  [class.wrap--eliminar]="modoEliminar"
+>
+
+  <!-- Hint de modo activo -->
+  <div *ngIf="modoConectar" class="mode-hint mode-hint--connect">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+    <span *ngIf="!nodoOrigenPendiente">Haz clic en el nodo <strong>origen</strong></span>
+    <span *ngIf="nodoOrigenPendiente">
+      <strong>{{ nodoOrigenPendiente.etiqueta }}</strong> → haz clic en el <strong>destino</strong>
+    </span>
+  </div>
+
+  <div *ngIf="modoEliminar" class="mode-hint mode-hint--delete">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+    </svg>
+    Haz clic en un <strong>nodo</strong> o <strong>conexión</strong> para eliminar
+  </div>
+
+  <!-- SVG principal -->
+  <svg
+    class="canvas-svg"
+    [attr.width]="CANVAS_W"
+    [attr.height]="canvasHeight"
+    (click)="onCanvasClick()"
+  >
+
+    <!-- ── Definiciones ── -->
+    <defs>
+      <!-- Marcador de flecha — flujo principal -->
+      <marker id="arr" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+        <path d="M0,1 L8,4.5 L0,8 Z" class="arr-main"/>
+      </marker>
+      <!-- Marcador de flecha — flujo alternativo -->
+      <marker id="arr-alt" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+        <path d="M0,1 L8,4.5 L0,8 Z" class="arr-alt"/>
+      </marker>
+      <!-- Sombra suave para nodos -->
+      <filter id="nodo-shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.10)"/>
+      </filter>
+      <!-- Sombra para nodo seleccionado -->
+      <filter id="nodo-shadow-sel" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="rgba(59,130,246,0.35)"/>
+      </filter>
+    </defs>
+
+    <!-- ── Swim lanes ── -->
+    <g *ngFor="let calle of calles; let i = index" class="lane-group">
+      <!-- Fondo de la calle -->
+      <rect
+        class="lane-bg"
+        [class.lane-bg--even]="i % 2 === 0"
+        x="0"
+        [attr.y]="laneY(i)"
+        [attr.width]="CANVAS_W"
+        [attr.height]="LANE_H"
+      />
+      <!-- Franja lateral de color (clickeable para editar) -->
+      <rect
+        class="lane-strip"
+        [class.lane-strip--editable]="!readonly && !modoConectar && !modoEliminar"
+        [attr.fill]="laneColor(i)"
+        x="0"
+        [attr.y]="laneY(i)"
+        [attr.width]="LANE_LABEL_W"
+        [attr.height]="LANE_H"
+        (click)="onCalleClick($event, calle)"
+      />
+      <!-- Label de la calle (texto rotado) -->
+      <text
+        class="lane-label"
+        [attr.transform]="'translate(' + (LANE_LABEL_W / 2) + ',' + (laneY(i) + LANE_H / 2) + ') rotate(-90)'"
+        (click)="onCalleClick($event, calle)"
+        [class.lane-label--editable]="!readonly && !modoConectar && !modoEliminar"
+      >{{ calle.departamentoNombre ?? calle.nombre }}</text>
+      <!-- Ícono de edición sobre la franja -->
+      <text
+        *ngIf="!readonly && !modoConectar && !modoEliminar"
+        class="lane-edit-icon"
+        [attr.x]="LANE_LABEL_W / 2"
+        [attr.y]="laneY(i) + 14"
+        text-anchor="middle"
+        (click)="onCalleClick($event, calle)"
+      >✎</text>
+      <!-- Separador inferior de calle -->
+      <line class="lane-divider"
+        x1="0" [attr.y1]="laneY(i) + LANE_H"
+        [attr.x2]="CANVAS_W" [attr.y2]="laneY(i) + LANE_H"/>
+    </g>
+
+    <!-- Mensaje cuando no hay calles -->
+    <g *ngIf="!calles.length">
+      <text class="empty-hint" [attr.x]="CANVAS_W / 2" y="80">
+        Agrega una calle para empezar a modelar
+      </text>
+      <text class="empty-hint-sub" [attr.x]="CANVAS_W / 2" y="106">
+        Los nodos de control (START, END…) pueden colocarse libremente sobre las calles
+      </text>
+    </g>
+
+    <!-- ── Conexiones (debajo de los nodos) ── -->
+    <g class="conexiones-layer">
+      <g *ngFor="let conn of conexiones" class="conexion-group"
+         (click)="onConexionClick($event, conn)">
+        <path
+          [attr.d]="getConexionPath(conn)"
+          [class]="conn.rama ? 'conn conn--alt' : 'conn conn--main'"
+          [attr.marker-end]="conn.rama ? 'url(#arr-alt)' : 'url(#arr)'"
+        />
+        <!-- Etiqueta de rama para DECISION -->
+        <text
+          *ngIf="conn.etiqueta && getMidpoint(conn) as mp"
+          class="conn-label"
+          [attr.x]="mp.x"
+          [attr.y]="mp.y - 6"
+          text-anchor="middle"
+        >{{ conn.etiqueta }}</text>
+      </g>
+    </g>
+
+    <!-- ── Nodos UML ── -->
+    <g class="nodos-layer">
+      <g
+        *ngFor="let nodo of nodos"
+        class="nodo-group"
+        [class.nodo-group--selected]="isSeleccionado(nodo.nodoId)"
+        [class.nodo-group--origen]="isOrigenPendiente(nodo.nodoId)"
+        [class.nodo-group--draggable]="!readonly && !modoConectar && !modoEliminar"
+        [class.nodo-group--connectable]="modoConectar"
+        [class.nodo-group--deletable]="modoEliminar"
+        (mousedown)="onNodoMouseDown($event, nodo)"
+        (click)="onNodoClick($event, nodo)"
+        role="button"
+        [attr.aria-label]="nodo.etiqueta"
+      >
+
+        <!-- ┌────────── START ──────────┐ -->
+        <circle
+          *ngIf="nodo.tipoNodo === 'START'"
+          [attr.cx]="nodoCx(nodo)"
+          [attr.cy]="nodoCy(nodo)"
+          [attr.r]="dim('START').w / 2"
+          [attr.filter]="isSeleccionado(nodo.nodoId) ? 'url(#nodo-shadow-sel)' : 'url(#nodo-shadow)'"
+          class="shape-start"
+        />
+
+        <!-- ┌────────── END ──────────┐ -->
+        <g *ngIf="nodo.tipoNodo === 'END'">
+          <circle
+            [attr.cx]="nodoCx(nodo)" [attr.cy]="nodoCy(nodo)"
+            [attr.r]="dim('END').w / 2"
+            [attr.filter]="isSeleccionado(nodo.nodoId) ? 'url(#nodo-shadow-sel)' : 'url(#nodo-shadow)'"
+            class="shape-end-outer"
+          />
+          <circle
+            [attr.cx]="nodoCx(nodo)" [attr.cy]="nodoCy(nodo)"
+            [attr.r]="dim('END').w / 2 - 6"
+            class="shape-end-inner"
+          />
+        </g>
+
+        <!-- ┌────────── ACTIVITY ──────────┐ -->
+        <g *ngIf="nodo.tipoNodo === 'ACTIVITY'">
+          <rect
+            [attr.x]="nodo.posicionCanvas.x"
+            [attr.y]="nodo.posicionCanvas.y"
+            [attr.width]="dim('ACTIVITY').w"
+            [attr.height]="dim('ACTIVITY').h"
+            rx="10"
+            [attr.filter]="isSeleccionado(nodo.nodoId) ? 'url(#nodo-shadow-sel)' : 'url(#nodo-shadow)'"
+            class="shape-activity"
+          />
+          <foreignObject
+            [attr.x]="nodo.posicionCanvas.x + 8"
+            [attr.y]="nodo.posicionCanvas.y + 8"
+            [attr.width]="dim('ACTIVITY').w - 16"
+            [attr.height]="dim('ACTIVITY').h - 16"
+          >
+            <div xmlns="http://www.w3.org/1999/xhtml" class="nodo-label-fo">
+              {{ nodo.etiqueta }}
+            </div>
+          </foreignObject>
+        </g>
+
+        <!-- ┌────────── DECISION ──────────┐ -->
+        <g *ngIf="nodo.tipoNodo === 'DECISION'">
+          <polygon
+            [attr.points]="
+              (nodo.posicionCanvas.x + dim('DECISION').w / 2) + ',' + nodo.posicionCanvas.y + ' ' +
+              (nodo.posicionCanvas.x + dim('DECISION').w)     + ',' + (nodo.posicionCanvas.y + dim('DECISION').h / 2) + ' ' +
+              (nodo.posicionCanvas.x + dim('DECISION').w / 2) + ',' + (nodo.posicionCanvas.y + dim('DECISION').h) + ' ' +
+              nodo.posicionCanvas.x                           + ',' + (nodo.posicionCanvas.y + dim('DECISION').h / 2)"
+            [attr.filter]="isSeleccionado(nodo.nodoId) ? 'url(#nodo-shadow-sel)' : 'url(#nodo-shadow)'"
+            class="shape-decision"
+          />
+          <text
+            class="nodo-label-svg"
+            [attr.x]="nodoCx(nodo)"
+            [attr.y]="nodoCy(nodo) + 4"
+            text-anchor="middle"
+          >?</text>
+        </g>
+
+        <!-- ┌────────── MERGE ──────────┐ -->
+        <g *ngIf="nodo.tipoNodo === 'MERGE'">
+          <polygon
+            [attr.points]="
+              (nodo.posicionCanvas.x + dim('MERGE').w / 2) + ',' + nodo.posicionCanvas.y + ' ' +
+              (nodo.posicionCanvas.x + dim('MERGE').w)     + ',' + (nodo.posicionCanvas.y + dim('MERGE').h / 2) + ' ' +
+              (nodo.posicionCanvas.x + dim('MERGE').w / 2) + ',' + (nodo.posicionCanvas.y + dim('MERGE').h) + ' ' +
+              nodo.posicionCanvas.x                        + ',' + (nodo.posicionCanvas.y + dim('MERGE').h / 2)"
+            [attr.filter]="isSeleccionado(nodo.nodoId) ? 'url(#nodo-shadow-sel)' : 'url(#nodo-shadow)'"
+            class="shape-merge"
+          />
+        </g>
+
+        <!-- ┌────────── FORK / JOIN ──────────┐ -->
+        <g *ngIf="nodo.tipoNodo === 'FORK' || nodo.tipoNodo === 'JOIN'">
+          <rect
+            [attr.x]="nodo.posicionCanvas.x"
+            [attr.y]="nodo.posicionCanvas.y"
+            [attr.width]="dim(nodo.tipoNodo).w"
+            [attr.height]="dim(nodo.tipoNodo).h"
+            rx="3"
+            [attr.filter]="isSeleccionado(nodo.nodoId) ? 'url(#nodo-shadow-sel)' : 'url(#nodo-shadow)'"
+            class="shape-forkjoin"
+          />
+          <text
+            class="nodo-label-forkjoin"
+            [attr.x]="nodo.posicionCanvas.x + dim(nodo.tipoNodo).w + 6"
+            [attr.y]="nodoCy(nodo) + 3"
+            text-anchor="start"
+          >{{ nodo.tipoNodo === 'FORK' ? 'FORK' : 'JOIN' }}</text>
+        </g>
+
+        <!-- ── Etiqueta para START / END ── -->
+        <text
+          *ngIf="nodo.tipoNodo === 'START' || nodo.tipoNodo === 'END'"
+          class="nodo-label-small"
+          [attr.x]="nodoCx(nodo)"
+          [attr.y]="nodo.posicionCanvas.y + dim(nodo.tipoNodo).h + 14"
+          text-anchor="middle"
+        >{{ nodo.tipoNodo }}</text>
+
+      </g><!-- /nodo-group -->
+    </g>
+
+  </svg><!-- /canvas-svg -->
+
+</div><!-- /wrap -->

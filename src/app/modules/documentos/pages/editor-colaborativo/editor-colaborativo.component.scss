@@ -1,0 +1,45 @@
+@use 'abstracts' as *;
+
+.editor-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - #{$header-height});
+}
+
+.editor-header {
+  @include flex-row($space-4);
+  align-items: center;
+  padding: $space-2 $space-4;
+  border-bottom: 1px solid $color-border;
+  background: $color-secondary-50;
+  flex-shrink: 0;
+
+  .doc-name {
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-lg;
+    color: $color-text-primary;
+  }
+}
+
+.editor-loading,
+.editor-error {
+  @include flex-col($space-3);
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: $space-8;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+}
+
+.editor-error {
+  color: $color-danger;
+}
+
+.editor-frame {
+  flex: 1;
+
+  &.hidden {
+    display: none;
+  }
+}

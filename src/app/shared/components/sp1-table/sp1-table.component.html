@@ -1,0 +1,112 @@
+<p-table
+  [value]="loading ? skeletonRows : (data ?? [])"
+  [paginator]="paginator && !loading"
+  [rows]="rows"
+  [rowsPerPageOptions]="rowsPerPageOptions"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+  styleClass="p-datatable-sm sp1-table"
+  [tableStyle]="{ 'min-width': '100%' }"
+  responsiveLayout="scroll"
+  [rowHover]="true"
+>
+  <!-- Caption opcional -->
+  <ng-template pTemplate="caption" *ngIf="caption">
+    <div class="sp1-table__caption">{{ caption }}</div>
+  </ng-template>
+
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <tr>
+      <th
+        *ngFor="let col of columns"
+        [pSortableColumn]="col.sortable ? col.key : undefined"
+        [style.width]="col.width"
+        [style.text-align]="col.align ?? 'left'"
+      >
+        <span>{{ col.header }}</span>
+        <p-sortIcon *ngIf="col.sortable" [field]="col.key"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+
+  <!-- Body único: skeleton cuando loading=true, datos reales cuando false -->
+  <ng-template pTemplate="body" let-row>
+
+    <!-- Fila skeleton (loading) -->
+    <tr *ngIf="loading">
+      <td *ngFor="let col of columns">
+        <p-skeleton height="1.5rem" borderRadius="6px"></p-skeleton>
+      </td>
+    </tr>
+
+    <!-- Fila normal (datos) -->
+    <tr *ngIf="!loading" (click)="rowClick.emit(row)" class="sp1-table__row">
+      <td
+        *ngFor="let col of columns"
+        [style.text-align]="col.align ?? 'left'"
+      >
+        <!-- Tipo: acciones -->
+        <div *ngIf="col.type === 'actions'" class="sp1-table__actions">
+          <ng-content select="[tableActions]"></ng-content>
+          <!-- Acciones default si no se provee ng-content -->
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-pencil"
+            class="p-button-text p-button-sm p-button-secondary"
+            pTooltip="Editar"
+            tooltipPosition="top"
+            (click)="onAction('edit', row, $event)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-trash"
+            class="p-button-text p-button-sm p-button-danger"
+            pTooltip="Eliminar"
+            tooltipPosition="top"
+            (click)="onAction('delete', row, $event)"
+          ></button>
+        </div>
+
+        <!-- Tipo: estado (badge) -->
+        <app-sp1-badge
+          *ngIf="col.type === 'status' || col.type === 'badge'"
+          [estado]="$any(getCellValue(row, col.key))"
+        ></app-sp1-badge>
+
+        <!-- Tipo: fecha -->
+        <span *ngIf="col.type === 'date'">
+          {{ $any(getCellValue(row, col.key)) | date: 'dd/MM/yyyy HH:mm' }}
+        </span>
+
+        <!-- Tipo: booleano -->
+        <span *ngIf="col.type === 'boolean'">
+          <app-sp1-badge [estado]="getCellValue(row, col.key) ? 'ACTIVO' : 'INACTIVO'"></app-sp1-badge>
+        </span>
+
+        <!-- Tipo: texto / número (default) -->
+        <span *ngIf="col.type === 'text' || col.type === 'number'">
+          {{ getCellValue(row, col.key) ?? '—' }}
+        </span>
+      </td>
+    </tr>
+
+  </ng-template>
+
+  <!-- Empty state -->
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td [colSpan]="columns.length" class="sp1-table__empty">
+        <app-sp1-empty-state
+          icon="pi pi-inbox"
+          [title]="emptyMessage"
+          message="Intenta ajustar los filtros o crear un nuevo registro"
+        ></app-sp1-empty-state>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

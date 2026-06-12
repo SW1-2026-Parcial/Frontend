@@ -1,0 +1,48 @@
+<header class="sp1-header" [class.sidebar-collapsed]="sidebarCollapsed" role="banner">
+  <!-- Breadcrumb -->
+  <div class="sp1-header__left">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ng-container *ngFor="let item of breadcrumb; let last = last">
+        <a *ngIf="!last && item.route" class="breadcrumb__item" [routerLink]="item.route">{{
+          item.label
+        }}</a>
+        <span *ngIf="last" class="breadcrumb__item breadcrumb__item--active" aria-current="page">
+          {{ item.label }}
+        </span>
+      </ng-container>
+    </nav>
+  </div>
+
+  <!-- Acciones derecha -->
+  <div class="sp1-header__right">
+    <!-- Notificaciones -->
+    <button
+      class="sp1-header__action-btn"
+      pTooltip="Notificaciones"
+      tooltipPosition="bottom"
+      aria-label="Notificaciones"
+    >
+      <i class="pi pi-bell"></i>
+      <span class="badge" aria-hidden="true"></span>
+    </button>
+
+    <div class="sp1-header__divider" role="separator"></div>
+
+    <!-- Avatar / Menú usuario -->
+    <div
+      class="sp1-header__avatar"
+      (click)="menuRef.toggle($event)"
+      [attr.aria-label]="'Menú de usuario'"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="menuRef.toggle($event)"
+    >
+      <ng-container *ngIf="usuario$ | async as usuario">
+        {{ usuario.nombre.slice(0, 2).toUpperCase() }}
+      </ng-container>
+    </div>
+
+    <!-- Menú contextual PrimeNG -->
+    <p-menu #menuRef [popup]="true" [model]="menuUsuario" styleClass="sp1-user-menu"></p-menu>
+  </div>
+</header>

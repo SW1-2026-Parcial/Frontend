@@ -1,0 +1,112 @@
+// _header.scss — Header global fijo
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.sp1-header {
+  position: fixed;
+  top: 0;
+  left: $sidebar-width;
+  right: 0;
+  height: $header-height;
+  background: $color-bg-header;
+  border-bottom: 1px solid $color-border;
+  @include flex-between;
+  padding: 0 $space-6;
+  z-index: $z-sticky;
+  transition: left $transition-base;
+  box-shadow: $shadow-xs;
+
+  &.sidebar-collapsed {
+    left: $sidebar-collapsed;
+  }
+
+  &__left {
+    @include flex-row($space-3);
+
+    .breadcrumb {
+      @include flex-row($space-2);
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+
+      &__item {
+        &:not(:last-child)::after {
+          content: '/';
+          margin-left: $space-2;
+          color: $color-border-strong;
+        }
+
+        &--active {
+          font-weight: $font-weight-medium;
+          color: $color-text-primary;
+        }
+      }
+    }
+  }
+
+  &__right {
+    @include flex-row($space-2);
+  }
+
+  &__action-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: $border-radius-md;
+    @include flex-center;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: background-color $transition-fast, color $transition-fast;
+    position: relative;
+
+    &:hover {
+      background: $color-secondary-100;
+      color: $color-text-primary;
+    }
+
+    &--active {
+      background: $color-primary-50;
+      color: $color-primary-500;
+    }
+
+    i {
+      font-size: 18px;
+    }
+
+    .badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 8px;
+      height: 8px;
+      background: $color-danger;
+      border-radius: $border-radius-full;
+      border: 2px solid $color-bg-header;
+    }
+  }
+
+  &__divider {
+    width: 1px;
+    height: 24px;
+    background: $color-border;
+    margin: 0 $space-1;
+  }
+
+  &__avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: $border-radius-full;
+    background: $color-primary-500;
+    @include flex-center;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-inverse;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color $transition-fast;
+
+    &:hover {
+      border-color: $color-primary-300;
+    }
+  }
+}

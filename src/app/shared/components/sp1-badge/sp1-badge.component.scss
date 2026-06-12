@@ -1,0 +1,20 @@
+@use 'abstracts' as *;
+
+// Badge de estado — usa variables SCSS del sistema, sin valores hardcodeados
+
+.sp1-badge {
+  @include status-badge($color-neutral-light, $color-neutral);
+  font-size: $font-size-xs;
+  letter-spacing: 0.01em;
+
+  i {
+    font-size: 10px;
+  }
+
+  // Estados del sistema — colores obligatorios según CLAUDE.md
+  &--danger  { @include status-badge($color-danger-light,  $color-danger); }
+  &--warning { @include status-badge($color-warning-light, $color-warning); }
+  &--success { @include status-badge($color-success-light, $color-success); }
+  &--info    { @include status-badge($color-info-light,    $color-info); }
+  &--neutral { @include status-badge($color-neutral-light, $color-neutral); }
+}

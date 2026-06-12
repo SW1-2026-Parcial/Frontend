@@ -1,0 +1,170 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-container__header">
+    <div class="page-container__title-group">
+      <h1 class="metricas__title">Métricas de Desempeño</h1>
+      <p class="metricas__subtitle">Análisis de cuellos de botella por versión de política</p>
+    </div>
+  </div>
+
+  <!-- Filtros de consulta -->
+  <div class="section metricas__filtros-section">
+    <div class="section__header">
+      <h2 class="metricas__section-title">Parámetros de consulta</h2>
+    </div>
+    <div class="metricas__filtros">
+      <!-- Selector de política -->
+      <div class="metricas__filtro-group">
+        <label class="metricas__label">Política</label>
+        <p-select
+          [options]="politicas"
+          optionLabel="nombre"
+          placeholder="Selecciona una política"
+          (onChange)="onPoliticaChange($event.value)"
+          appendTo="body"
+          styleClass="metricas__select">
+        </p-select>
+      </div>
+
+      <!-- Selector de versión -->
+      <div class="metricas__filtro-group">
+        <label class="metricas__label">Versión</label>
+        <p-select
+          [options]="versionOpciones"
+          [(ngModel)]="versionSeleccionada"
+          optionLabel="label"
+          placeholder="Selecciona una versión"
+          [disabled]="versionOpciones.length === 0"
+          appendTo="body"
+          styleClass="metricas__select">
+        </p-select>
+      </div>
+
+      <!-- Fecha desde -->
+      <div class="metricas__filtro-group">
+        <label class="metricas__label">Desde</label>
+        <input
+          type="date"
+          [(ngModel)]="desde"
+          class="metricas__date-input"
+          pInputText />
+      </div>
+
+      <!-- Fecha hasta -->
+      <div class="metricas__filtro-group">
+        <label class="metricas__label">Hasta</label>
+        <input
+          type="date"
+          [(ngModel)]="hasta"
+          class="metricas__date-input"
+          pInputText />
+      </div>
+
+      <!-- Botón consultar -->
+      <button
+        pButton
+        pRipple
+        type="button"
+        label="Consultar"
+        icon="pi pi-search"
+        severity="primary"
+        [loading]="loading"
+        [disabled]="!versionSeleccionada"
+        (click)="consultar()"
+        class="metricas__btn-consultar">
+      </button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="metricas__error" *ngIf="errorMsg">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ errorMsg }}</span>
+  </div>
+
+  <!-- KPIs de performance -->
+  <ng-container *ngIf="performance">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-card__value">{{ performance.total }}</span>
+        <span class="kpi-card__label">Total trámites</span>
+      </div>
+      <div class="kpi-card kpi-card--completed">
+        <span class="kpi-card__value">{{ performance.completed }}</span>
+        <span class="kpi-card__label">Completados</span>
+      </div>
+      <div class="kpi-card kpi-card--active">
+        <span class="kpi-card__value">{{ performance.active }}</span>
+        <span class="kpi-card__label">Activos</span>
+      </div>
+      <div class="kpi-card kpi-card--rejected">
+        <span class="kpi-card__value">{{ performance.rejected }}</span>
+        <span class="kpi-card__label">Rechazados</span>
+      </div>
+      <div class="kpi-card kpi-card--time">
+        <span class="kpi-card__value">{{ performance.avgCompletionMs != null ? formatMsLong(performance.avgCompletionMs) : '—' }}</span>
+        <span class="kpi-card__label">Tiempo promedio</span>
+      </div>
+    </div>
+
+    <!-- Gráfico de barras -->
+    <div class="section" *ngIf="chartData && bottlenecks.length > 0">
+      <div class="section__header">
+        <h2 class="metricas__section-title">Tiempo promedio por nodo</h2>
+        <span class="metricas__chart-hint">mayor duración = cuello de botella</span>
+      </div>
+      <div class="metricas__chart-container">
+        <p-chart
+          type="bar"
+          [data]="chartData"
+          [options]="chartOptions"
+          height="300px">
+        </p-chart>
+      </div>
+    </div>
+
+    <!-- Tabla de cuellos de botella -->
+    <div class="section" *ngIf="bottlenecks.length > 0">
+      <div class="section__header">
+        <h2 class="metricas__section-title">Ranking de cuellos de botella</h2>
+      </div>
+      <p-table [value]="bottlenecks" responsiveLayout="scroll" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 100px">Ranking</th>
+            <th>Nodo</th>
+            <th>Tiempo promedio</th>
+            <th>Ejecuciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-b>
+          <tr>
+            <td>
+              <p-tag [value]="'#' + b.ranking" [severity]="rankingSeverity(b.ranking)"></p-tag>
+            </td>
+            <td class="metricas__nodo-label">{{ b.etiqueta }}</td>
+            <td class="metricas__tiempo">{{ formatMs(b.avgDurationMs) }}</td>
+            <td class="metricas__ejecuciones">{{ b.count }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="metricas__empty">Sin datos de cuellos de botella</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </ng-container>
+
+  <!-- Estado inicial vacío -->
+  <ng-container *ngIf="!performance && !loading && !errorMsg">
+    <app-sp1-empty-state
+      icon="pi-chart-bar"
+      title="Selecciona una política y versión"
+      message="Elige la política y la versión publicada para consultar sus métricas de desempeño.">
+    </app-sp1-empty-state>
+  </ng-container>
+
+</div>

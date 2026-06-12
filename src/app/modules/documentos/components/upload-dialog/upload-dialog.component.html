@@ -1,0 +1,26 @@
+<p-toast />
+
+<div class="upload-container">
+  <p-fileUpload
+    mode="advanced"
+    [auto]="true"
+    [customUpload]="true"
+    (uploadHandler)="onSelect($event)"
+    accept=".pdf,.docx,.doc,.xlsx,.xls,.pptx,.ppt,.txt,.csv,.png,.jpg,.jpeg,.gif"
+    [maxFileSize]="52428800"
+    chooseLabel="Seleccionar archivo"
+    chooseIcon="pi pi-plus"
+    [showUploadButton]="false"
+    [showCancelButton]="false"
+  >
+    <ng-template #empty>
+      <div class="upload-empty">
+        <i class="pi pi-cloud-upload text-4xl text-color-secondary"></i>
+        <p class="mt-2 text-color-secondary">Arrastra un archivo aquí o haz clic para seleccionar</p>
+        <p class="text-xs text-color-secondary">Formatos: PDF, Word, Excel, PowerPoint, imágenes, texto. Máx 50MB.</p>
+      </div>
+    </ng-template>
+  </p-fileUpload>
+
+  <p-progressBar *ngIf="uploading" mode="indeterminate" [style]="{ height: '4px', marginTop: '0.5rem' }" />
+</div>

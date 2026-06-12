@@ -1,0 +1,74 @@
+<div class="catalogo">
+
+  <div class="catalogo__header">
+    <div class="catalogo__title-area">
+      <h1 class="catalogo__title">Iniciar nuevo trámite</h1>
+      <p class="catalogo__subtitle">Selecciona el tipo de proceso que deseas iniciar</p>
+    </div>
+
+    <!-- Buscador -->
+    <div class="catalogo__search">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          [(ngModel)]="textoBusqueda"
+          (ngModelChange)="aplicarFiltro()"
+          placeholder="Buscar proceso…"
+          class="catalogo__search-input"
+        />
+      </p-iconfield>
+    </div>
+  </div>
+
+  <!-- Loading skeletons -->
+  <div *ngIf="loading" class="catalogo__grid">
+    <div *ngFor="let i of [1,2,3,4,5,6]" class="policy-card policy-card--skeleton">
+      <p-skeleton height="20px" width="70%" styleClass="mb-2"></p-skeleton>
+      <p-skeleton height="14px" width="100%" styleClass="mb-1"></p-skeleton>
+      <p-skeleton height="14px" width="85%" styleClass="mb-3"></p-skeleton>
+      <p-skeleton height="32px" width="100%"></p-skeleton>
+    </div>
+  </div>
+
+  <!-- Grid de políticas -->
+  <div *ngIf="!loading && filtradas.length" class="catalogo__grid">
+    <div
+      *ngFor="let p of filtradas"
+      class="policy-card"
+      (click)="verDetalle(p)"
+      role="button"
+      tabindex="0"
+      (keyup.enter)="verDetalle(p)"
+    >
+      <div class="policy-card__header">
+        <span class="policy-card__badge">
+          <i class="pi pi-check-circle"></i> Publicada
+        </span>
+        <span class="policy-card__version">v{{ p.versionActual }}</span>
+      </div>
+
+      <h3 class="policy-card__name">{{ p.nombre }}</h3>
+      <p class="policy-card__desc">{{ p.descripcion || 'Sin descripción' }}</p>
+
+      <div class="policy-card__footer">
+        <button
+          pButton pRipple type="button"
+          label="Ver proceso" icon="pi pi-arrow-right"
+          iconPos="right"
+          class="p-button-primary p-button-sm w-full"
+          (click)="verDetalle(p); $event.stopPropagation()"
+        ></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <app-sp1-empty-state
+    *ngIf="!loading && !filtradas.length"
+    icon="pi-inbox"
+    [title]="textoBusqueda ? 'Sin resultados' : 'No hay procesos disponibles'"
+    [message]="textoBusqueda ? 'Intenta con otro término de búsqueda.' : 'El administrador aún no ha publicado ninguna política.'"
+  ></app-sp1-empty-state>
+
+</div>

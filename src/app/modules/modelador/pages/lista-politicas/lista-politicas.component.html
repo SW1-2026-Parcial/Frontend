@@ -1,0 +1,96 @@
+<div class="page-container">
+
+  <div class="page-container__header">
+    <div class="page-container__title-group">
+      <h1 class="page-title">Políticas de Negocio</h1>
+      <p class="page-subtitle">Define y gestiona los flujos de proceso para la instalación de medidores</p>
+    </div>
+    <button
+      pButton pRipple
+      type="button"
+      label="Nueva política"
+      icon="pi pi-plus"
+      class="p-button-primary"
+      (click)="mostrarDialogNueva = true"
+    ></button>
+  </div>
+
+  <div class="section">
+    <div class="section__header">
+      <h2 class="section-title">Todas las políticas</h2>
+      <p-tag
+        [value]="((politicas$ | async)?.length ?? 0) + ' registros'"
+        severity="secondary"
+      ></p-tag>
+    </div>
+
+    <app-sp1-table
+      [columns]="columnas"
+      [data]="politicas$ | async"
+      [loading]="(loading$ | async) ?? false"
+      emptyMessage="No hay políticas registradas"
+      (rowClick)="onRowClick($event)"
+      (actionClick)="onAccion($event)"
+    >
+    </app-sp1-table>
+  </div>
+
+
+</div>
+
+<!-- Dialog nueva política -->
+<app-sp1-dialog
+  [(visible)]="mostrarDialogNueva"
+  title="Nueva política"
+  subtitle="La política se creará en estado Borrador para su edición"
+  size="md"
+  confirmLabel="Crear y editar"
+  confirmIcon="pi pi-sitemap"
+  [loading]="loadingGuardar"
+  (confirm)="crearPolitica()"
+  (cancel)="mostrarDialogNueva = false"
+>
+  <form [formGroup]="formNueva" novalidate class="form-nueva-politica">
+
+    <div class="form-field-group">
+      <label for="nombrePolitica" class="label-field">
+        Nombre <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="nombrePolitica"
+        type="text"
+        pInputText
+        formControlName="nombre"
+        placeholder="Ej: Proceso de Instalación de Medidor Residencial"
+        [class.ng-invalid]="esInvalido('nombre')"
+        style="width: 100%"
+      />
+      <small *ngIf="esInvalido('nombre')" class="text-danger text-xs" role="alert">
+        {{ errorDe('nombre') }}
+      </small>
+    </div>
+
+    <div class="form-field-group">
+      <label for="descPolitica" class="label-field">
+        Descripción <span class="text-danger" aria-hidden="true">*</span>
+      </label>
+      <textarea
+        id="descPolitica"
+        pInputTextarea
+        formControlName="descripcion"
+        placeholder="Describe el proceso que esta política define"
+        [autoResize]="true"
+        rows="3"
+        [class.ng-invalid]="esInvalido('descripcion')"
+        style="width: 100%"
+      ></textarea>
+      <small *ngIf="esInvalido('descripcion')" class="text-danger text-xs" role="alert">
+        {{ errorDe('descripcion') }}
+      </small>
+    </div>
+
+  </form>
+</app-sp1-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast position="top-right"></p-toast>

@@ -1,0 +1,147 @@
+<div class="page-container">
+
+  <!-- Header de página -->
+  <div class="page-container__header">
+    <div class="page-container__title-group">
+      <h1 class="page-title">Gestión de Usuarios</h1>
+      <p class="page-subtitle">Administración de usuarios y departamentos del sistema</p>
+    </div>
+    <div class="page-actions">
+      <button
+        *ngIf="tabActivo == 0"
+        pButton
+        pRipple
+        type="button"
+        label="Nuevo usuario"
+        icon="pi pi-plus"
+        class="p-button-primary"
+        (click)="nuevoUsuario()"
+      ></button>
+      <button
+        *ngIf="tabActivo == 1"
+        pButton
+        pRipple
+        type="button"
+        label="Nuevo departamento"
+        icon="pi pi-plus"
+        class="p-button-primary"
+        (click)="nuevoDepartamento()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--primary">
+        <i class="pi pi-users" aria-hidden="true"></i>
+      </div>
+      <div class="kpi-card__data">
+        <span class="kpi-card__value">{{ total$ | async }}</span>
+        <span class="kpi-card__label">Total usuarios</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--warning">
+        <i class="pi pi-building" aria-hidden="true"></i>
+      </div>
+      <div class="kpi-card__data">
+        <span class="kpi-card__value">{{ (departamentos$ | async)?.length ?? 0 }}</span>
+        <span class="kpi-card__label">Departamentos</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs: Usuarios | Departamentos -->
+  <div class="section">
+    <p-tabs [value]="tabActivo" (valueChange)="tabActivo = $event ?? '0'">
+      <p-tablist>
+        <p-tab value="0"><i class="pi pi-users"></i>&nbsp; Usuarios</p-tab>
+        <p-tab value="1"><i class="pi pi-building"></i>&nbsp; Departamentos</p-tab>
+      </p-tablist>
+      <p-tabpanels>
+
+        <!-- Tab Usuarios -->
+        <p-tabpanel value="0">
+          <div class="tab-toolbar">
+            <p-iconfield>
+              <p-inputicon styleClass="pi pi-search" />
+              <input
+                pInputText
+                type="text"
+                placeholder="Buscar usuario..."
+                [(ngModel)]="filtroTexto"
+                aria-label="Buscar usuario"
+              />
+            </p-iconfield>
+          </div>
+
+          <app-sp1-table
+            [columns]="columnasUsuarios"
+            [data]="usuariosConDepto$ | async"
+            [loading]="(loadingUsers$ | async) ?? false"
+            emptyMessage="No hay usuarios registrados"
+            (rowClick)="onRowClick($event)"
+            (actionClick)="onAccionUsuario($event)"
+          ></app-sp1-table>
+        </p-tabpanel>
+
+        <!-- Tab Departamentos -->
+        <p-tabpanel value="1">
+          <app-sp1-table
+            [columns]="columnasDepartamentos"
+            [data]="departamentos$ | async"
+            [loading]="(loadingDeptos$ | async) ?? false"
+            emptyMessage="No hay departamentos registrados"
+            (rowClick)="editarDepartamento($any($event))"
+            (actionClick)="onAccionDepartamento($event)"
+          ></app-sp1-table>
+        </p-tabpanel>
+
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+
+</div>
+
+<!-- Dialog crear/editar Usuario -->
+<app-sp1-dialog
+  [(visible)]="mostrarDialogUsuario"
+  [title]="modoEdicion ? 'Editar usuario' : 'Nuevo usuario'"
+  [subtitle]="modoEdicion ? 'Modifica los datos del usuario' : 'Completa los datos para crear un nuevo usuario'"
+  size="md"
+  [loading]="loadingGuardar"
+  [showFooter]="false"
+  (cancel)="mostrarDialogUsuario = false"
+>
+  <app-form-usuario
+    [usuario]="usuarioSeleccionado"
+    [departamentos]="(departamentos$ | async) ?? []"
+    [modoEdicion]="modoEdicion"
+    (guardar)="guardarUsuario($event)"
+    (cancelar)="mostrarDialogUsuario = false"
+  ></app-form-usuario>
+</app-sp1-dialog>
+
+<!-- Dialog crear/editar Departamento -->
+<app-sp1-dialog
+  [(visible)]="mostrarDialogDepartamento"
+  [title]="modoEdicion ? 'Editar departamento' : 'Nuevo departamento'"
+  size="md"
+  [loading]="loadingGuardar"
+  [showFooter]="false"
+  (cancel)="mostrarDialogDepartamento = false"
+>
+  <app-form-departamento
+    [departamento]="deptoSeleccionado"
+    [modoEdicion]="modoEdicion"
+    (guardar)="guardarDepartamento($event)"
+    (cancelar)="mostrarDialogDepartamento = false"
+  ></app-form-departamento>
+</app-sp1-dialog>
+
+<!-- Confirm dialog para cambios de estado -->
+<p-confirmDialog styleClass="sp1-confirm-dialog"></p-confirmDialog>
+
+<!-- Toast de notificaciones -->
+<p-toast position="top-right" [life]="3000"></p-toast>

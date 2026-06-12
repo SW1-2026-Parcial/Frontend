@@ -1,0 +1,127 @@
+<aside class="palette" aria-label="Paleta de nodos">
+
+  <!-- ── Nodos ── -->
+  <p class="palette__title">Nodos</p>
+
+  <div class="palette__items">
+    <div
+      *ngFor="let item of items"
+      class="palette__item"
+      draggable="true"
+      (dragstart)="onDragStart($event, item.tipo)"
+      [title]="'Arrastrar: ' + item.label"
+      role="button"
+      tabindex="0"
+    >
+      <!-- Preview SVG miniatura -->
+      <svg class="palette__preview" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+
+        <circle *ngIf="item.tipo === 'START'"
+          cx="24" cy="24" r="14" class="prev-start"/>
+
+        <g *ngIf="item.tipo === 'END'">
+          <circle cx="24" cy="24" r="14" class="prev-end-outer"/>
+          <circle cx="24" cy="24" r="8"  class="prev-end-inner"/>
+        </g>
+
+        <rect *ngIf="item.tipo === 'ACTIVITY'"
+          x="3" y="15" width="42" height="18" rx="5" class="prev-activity"/>
+
+        <polygon *ngIf="item.tipo === 'DECISION'"
+          points="24,5 43,24 24,43 5,24" class="prev-decision"/>
+
+        <polygon *ngIf="item.tipo === 'MERGE'"
+          points="24,5 43,24 24,43 5,24" class="prev-merge"/>
+
+        <g *ngIf="item.tipo === 'FORK'">
+          <rect x="21" y="4" width="6" height="40" rx="2" class="prev-forkjoin"/>
+          <line x1="24" y1="4"  x2="24" y2="7"  class="prev-forkline"/>
+          <line x1="21" y1="28" x2="8"  y2="42" class="prev-forkline"/>
+          <line x1="27" y1="28" x2="40" y2="42" class="prev-forkline"/>
+        </g>
+
+        <g *ngIf="item.tipo === 'JOIN'">
+          <rect x="21" y="4" width="6" height="40" rx="2" class="prev-forkjoin"/>
+          <line x1="8"  y1="8"  x2="21" y2="20" class="prev-forkline"/>
+          <line x1="40" y1="8"  x2="27" y2="20" class="prev-forkline"/>
+          <line x1="24" y1="44" x2="24" y2="48" class="prev-forkline"/>
+        </g>
+
+      </svg>
+
+      <span class="palette__item-label">{{ item.label }}</span>
+
+      <svg class="palette__grip" viewBox="0 0 10 16" aria-hidden="true">
+        <circle cx="3" cy="4"  r="1.4" fill="#d1d5db"/>
+        <circle cx="7" cy="4"  r="1.4" fill="#d1d5db"/>
+        <circle cx="3" cy="8"  r="1.4" fill="#d1d5db"/>
+        <circle cx="7" cy="8"  r="1.4" fill="#d1d5db"/>
+        <circle cx="3" cy="12" r="1.4" fill="#d1d5db"/>
+        <circle cx="7" cy="12" r="1.4" fill="#d1d5db"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── Separador ── -->
+  <div class="palette__sep" role="separator"></div>
+
+  <!-- ── Herramientas ── -->
+  <p class="palette__title">Herramientas</p>
+
+  <div class="palette__tools">
+
+    <!-- ── Botón IA ── -->
+    <button
+      type="button"
+      class="palette__tool palette__tool--ia"
+      (click)="sugerirIA()"
+      title="Generar o editar diagrama con IA (CU-04)"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
+      </svg>
+      <span>IA</span>
+    </button>
+
+    <!-- ── Separador interno ── -->
+    <div class="palette__sep palette__sep--sm" role="separator"></div>
+
+    <button type="button" class="palette__tool" (click)="agregarCalle()" title="Agregar swim lane">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <line x1="3" y1="9" x2="21" y2="9"/>
+        <line x1="3" y1="15" x2="21" y2="15"/>
+        <line x1="12" y1="9" x2="12" y2="21"/>
+      </svg>
+      <span>Calle</span>
+    </button>
+
+    <button
+      type="button"
+      class="palette__tool"
+      [class.palette__tool--active]="modoConectar"
+      (click)="toggleConectar()"
+      title="Conectar nodos"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M5 12h14M13 6l6 6-6 6"/>
+      </svg>
+      <span>{{ modoConectar ? 'Cancelar' : 'Conectar' }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="palette__tool palette__tool--danger"
+      [class.palette__tool--active]="modoEliminar"
+      (click)="toggleEliminar()"
+      title="Eliminar nodos o conexiones"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+      </svg>
+      <span>{{ modoEliminar ? 'Cancelar' : 'Eliminar' }}</span>
+    </button>
+
+  </div>
+
+</aside>

@@ -1,0 +1,57 @@
+@use 'abstracts' as *;
+
+.repositorio-container {
+  padding: $space-6;
+  @include flex-col($space-4);
+
+  h2 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+}
+
+.repositorio-filtros {
+  @include flex-row($space-4);
+  align-items: center;
+
+  &__search {
+    flex: 1;
+    max-width: 400px;
+  }
+}
+
+// ── TreeView ──────────────────────────────────────────────────────────────────
+
+.repo-tree-node {
+  @include flex-row($space-2);
+  align-items: center;
+  width: 100%;
+  padding: $space-1 0;
+
+  &__actions {
+    display: flex;
+    gap: 0;
+    opacity: 0;
+    transition: opacity $transition-fast;
+  }
+}
+
+:host ::ng-deep .p-tree-node-content:hover .repo-tree-node__actions {
+  opacity: 1;
+}
+
+.repo-tree-node--documento {
+  .repo-tree-node__actions {
+    margin-left: auto;
+  }
+}
+
+.repositorio-tramite-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}

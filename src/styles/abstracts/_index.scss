@@ -1,0 +1,5 @@
+// Convenience barrel — cada componente importa solo esto:
+// @use 'abstracts' as *;
+@forward 'variables';
+@forward 'functions';
+@forward 'mixins' hide rem, em, alpha;
