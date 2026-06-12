@@ -15,6 +15,10 @@ export class WebsocketService implements OnDestroy {
   private pool = new Map<string, WsConnection>();
 
   private get wsBase(): string {
+    if (environment.apiUrl.startsWith('/')) {
+      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      return `${protocol}://${window.location.host}`;
+    }
     return environment.apiUrl
       .replace('/api', '')
       .replace(/^http/, 'ws');
