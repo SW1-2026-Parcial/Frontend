@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://backend-prod.proudsmoke-dbce02fc.eastus2.azurecontainerapps.io/api',
+  apiUrl: "http://167.99.7.252:8080/api",
+  onlyofficeUrl: 'http://167.99.7.252:8088',
 };

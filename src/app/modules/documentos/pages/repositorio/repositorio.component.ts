@@ -4,6 +4,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subject, takeUntil, timeout, TimeoutError } from 'rxjs';
 import { MessageService, ConfirmationService, TreeNode } from 'primeng/api';
 
+import { environment } from '../../../../../environments/environment';
 import { DocumentoService } from '../../services/documento.service';
 import {
   Documento,
@@ -253,7 +254,7 @@ export class RepositorioComponent implements OnInit, OnDestroy {
   }
 
   private verificarOnlyOfficeYAbrir(doc: Documento): void {
-    fetch('http://localhost:8088/healthcheck', { mode: 'no-cors' })
+    fetch(`${environment.onlyofficeUrl}/healthcheck`, { mode: 'no-cors' })
       .then(() => this.router.navigate(['/documentos/editor', doc.id]))
       .catch(() => {
         this.messageService.add({

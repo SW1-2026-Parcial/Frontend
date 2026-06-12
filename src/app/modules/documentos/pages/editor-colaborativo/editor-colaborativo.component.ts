@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
+import { environment } from '../../../../../environments/environment';
 import { DocumentoService } from '../../services/documento.service';
 import { EditUrlResponse } from '../../../../shared/models/documento.model';
 
@@ -80,7 +81,7 @@ export class EditorColaborativoComponent implements OnInit, OnDestroy, AfterView
   }
 
   private loadOnlyOfficeScript(config: EditUrlResponse): void {
-    const onlyofficeUrl = config.onlyofficeUrl || 'http://localhost:8088';
+    const onlyofficeUrl = config.onlyofficeUrl || environment.onlyofficeUrl;
 
     if (this.scriptLoaded || (window as any).DocsAPI) {
       this.createEditor(config);
