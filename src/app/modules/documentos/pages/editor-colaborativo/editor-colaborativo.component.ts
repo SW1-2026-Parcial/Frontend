@@ -31,6 +31,8 @@ export class EditorColaborativoComponent implements OnInit, OnDestroy, AfterView
   loading = true;
   error = '';
   showDetalle = false;
+  guardando = false;
+  tienesCambios = false;
   private docEditor: any = null;
   private scriptLoaded = false;
 
@@ -64,6 +66,24 @@ export class EditorColaborativoComponent implements OnInit, OnDestroy, AfterView
 
   volver(): void {
     this.router.navigate(['/documentos']);
+  }
+
+  guardar(): void {
+    if (!this.docEditor) return;
+    this.guardando = true;
+    try {
+      this.docEditor.connector?.executeMethod('ForceSave');
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Guardando...',
+        detail: 'Enviando cambios al servidor',
+        life: 3000,
+      });
+    } catch (e) {
+      console.error('ForceSave error:', e);
+    }
+    // El guardado real lo confirma onDocumentStateChange cuando data=false
+    setTimeout(() => { this.guardando = false; }, 5000);
   }
 
   private initEditor(): void {
@@ -137,10 +157,20 @@ export class EditorColaborativoComponent implements OnInit, OnDestroy, AfterView
         },
         onDocumentStateChange: (event: any) => {
           // event.data = true si hay cambios sin guardar
+          this.tienesCambios = event.data;
           if (event.data) {
             document.title = `● ${config.nombre} — SP1 BPM`;
           } else {
+            this.guardando = false;
             document.title = `${config.nombre} — SP1 BPM`;
+            if (!this.loading) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Guardado',
+                detail: 'Documento guardado en el servidor',
+                life: 2000,
+              });
+            }
           }
         },
       },

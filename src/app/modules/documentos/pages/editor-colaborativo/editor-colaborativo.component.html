@@ -13,6 +13,16 @@
       <i class="pi pi-file-edit mr-2"></i>{{ nombreDoc }}
     </span>
     <p-button
+      icon="pi pi-save"
+      label="Guardar"
+      severity="success"
+      [loading]="guardando"
+      [disabled]="!tienesCambios"
+      (onClick)="guardar()"
+      pTooltip="Forzar guardado en el servidor (también Ctrl+S en el editor)"
+      *ngIf="!loading && !error"
+    />
+    <p-button
       icon="pi pi-info-circle"
       label="Info / Permisos"
       [text]="true"
